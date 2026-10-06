@@ -1,41 +1,74 @@
 export default function AboutPage() {
+  const stats = [
+    { value: "1954", label: "Established" },
+    { value: "9,000+", label: "Products stocked" },
+    { value: "14", label: "Active routes" },
+    { value: "320+", label: "Trade partners" },
+  ];
+
   return (
     <>
-      <section className="page-hero">
+      <section className="page-hero about-page-hero">
         <div className="shell">
-          <p className="eyebrow">About Brown Derby</p>
-          <h1>A wholesale business with deep local roots.</h1>
+          <p className="eyebrow">Our history</p>
+          <h1>Seven decades of honest trade in Central Newfoundland.</h1>
           <p>
-            Brown Derby Wholesale grew from the original Brown Derby business in
-            Grand Falls-Windsor and has been part of the local business community for
-            generations.
+            Brown Derby Wholesale has served merchants, restaurants, convenience
+            stores, and institutions from Grand Falls-Windsor since 1954.
           </p>
         </div>
       </section>
 
-      <section>
-        <div className="shell about-grid">
-          <aside className="about-stat">
-            <strong>1940s</strong>
-            <span>Roots of the Brown Derby wholesale story</span>
+      <section className="about-story-section">
+        <div className="shell about-story-grid">
+          <aside className="about-year-card">
+            <span>Since</span>
+            <strong>1954</strong>
+            <p>A family-run wholesale business built around long-term relationships.</p>
           </aside>
 
-          <div className="about-copy">
+          <div className="about-story-copy">
             <p>
-              The Brown Derby story began in Grand Falls-Windsor in the 1940s. The
-              original business brought products in to serve its own customers, and
-              that buying activity eventually expanded into supplying other local
-              businesses.
+              Brown Derby Wholesale opened its doors in Grand Falls-Windsor in 1954,
+              founded on a simple conviction: that the merchants and restaurateurs of
+              Central Newfoundland deserved a supplier who knew them by name.
             </p>
             <p>
-              That wholesale operation became Brown Derby Wholesale — a business built
-              around sourcing products and serving business customers from Central
-              Newfoundland.
+              Three generations later, that conviction still anchors every decision we
+              make — from the relationships we cultivate with growers and manufacturers,
+              to the routes our drivers run each week from Twillingate to Buchans,
+              Glenwood to Springdale.
             </p>
             <p>
-              This website is the next step in that story: making it easier for
-              customers to discover what Brown Derby carries and, over time, order
-              directly online.
+              Today we stock over nine thousand SKUs across pantry provisions,
+              beverages, sanitary supplies, general merchandise, and other wholesale
+              categories — all at the trade prices our partners depend on to help their
+              own businesses thrive.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-stats-section">
+        <div className="shell about-stats-grid">
+          {stats.map((stat) => (
+            <div className="about-stat-block" key={stat.label}>
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section about-values-section">
+        <div className="shell">
+          <div className="section-heading">
+            <p className="eyebrow">How we work</p>
+            <h2>Built around relationships, reliability, and practical service.</h2>
+            <p>
+              Brown Derby Wholesale remains focused on the same thing that built the
+              business in the first place: knowing our customers, carrying the products
+              they rely on, and being dependable when they need us.
             </p>
           </div>
         </div>
