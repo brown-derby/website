@@ -7,61 +7,87 @@ type Product = {
   id: string;
   name: string;
   category: string;
-  glGroup: string;
-  itemType: string;
-  websitePrice: number | null;
-  observedPrice1: number | null;
-  observedPrice2: number | null;
-  priceStatus: string;
-  storefrontStatus: string;
+  websitePrice: number;
 };
 
-const allProducts = (products as Product[]).filter(
-  (product) => product.storefrontStatus !== "Exclude from storefront"
-);
+const allProducts = products as Product[];
+
+const categoryDescriptions: Record<string, string> = {
+  "Baking & Foodservice Ingredients":
+    "Baking mixes, toppings, syrups, bulk ingredients, and kitchen staples for foodservice.",
+  "Batteries & Convenience":
+    "Batteries and everyday convenience items for counters, stores, and workplaces.",
+  "Beverages":
+    "Water, energy drinks, soft drinks, drink mixes, and other refreshment products.",
+  "Candy & Chocolate":
+    "Chocolate bars, candy, gum, novelty sweets, and other confectionery favourites.",
+  "Cleaning & Janitorial":
+    "Cleaning chemicals, paper products, janitorial supplies, and workplace sanitation essentials.",
+  "Fishing Supplies":
+    "Fishing tackle, accessories, and practical supplies for anglers and retailers.",
+  "Food & Grocery":
+    "Shelf-stable grocery items, sauces, condiments, canned goods, and everyday food products.",
+  "Frozen & Refrigerated":
+    "Frozen and chilled products that require temperature-controlled storage.",
+  "General Merchandise":
+    "A varied mix of everyday merchandise and convenience-store products.",
+  "Health & Personal Care":
+    "Personal care, hygiene, and everyday health-related convenience products.",
+  "Industrial Oils & Lubricants":
+    "Motor oils, lubricants, fluids, and related products for automotive and industrial use.",
+  "Packaging & Disposables":
+    "Bags, cups, containers, food packaging, disposable serviceware, and takeout supplies.",
+  "Pet Supplies":
+    "Food, treats, and everyday supplies for pets.",
+  "Restaurant Equipment & Smallwares":
+    "Kitchen tools, foodservice equipment, utensils, containers, and restaurant smallwares.",
+  "Snacks":
+    "Chips, crackers, cookies, nuts, and other packaged snack foods.",
+  "Tobacco & Smoking":
+    "Tobacco and smoking-related products available through Brown Derby Wholesale.",
+};
 
 const money = new Intl.NumberFormat("en-CA", {
   style: "currency",
   currency: "CAD",
 });
 
-function Price({ product }: { product: Product }) {
-  if (product.websitePrice !== null) {
-    return (
-      <div className="product-price">
-        <strong>{money.format(product.websitePrice)}</strong>
-        <span>case / listed unit</span>
-      </div>
-    );
-  }
-
-  if (
-    product.observedPrice1 !== null &&
-    product.observedPrice2 !== null &&
-    product.observedPrice1 !== product.observedPrice2
-  ) {
-    return (
-      <div className="product-price product-price-review">
-        <strong>
-          {money.format(product.observedPrice1)} / {money.format(product.observedPrice2)}
-        </strong>
-        <span>two price records — confirming current price</span>
-      </div>
-    );
-  }
-
+function ProductTable({
+  items,
+  showCategory = false,
+}: {
+  items: Product[];
+  showCategory?: boolean;
+}) {
   return (
-    <div className="product-price product-price-review">
-      <strong>Contact for price</strong>
-      <span>current price needs confirmation</span>
+    <div className="product-table-wrap">
+      <table className="product-table">
+        <thead>
+          <tr>
+            <th>Item #</th>
+            <th>Product</th>
+            {showCategory && <th>Category</th>}
+            <th className="price-column">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((product) => (
+            <tr key={product.id}>
+              <td className="item-id">{product.id}</td>
+              <td className="product-name-cell">{product.name}</td>
+              {showCategory && <td>{product.category}</td>}
+              <td className="price-column">{money.format(product.websitePrice)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
 export default function ProductCatalog() {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("All products");
-  const [visible, setVisible] = useState(60);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const categories = useMemo(() => {
     const counts = new Map<string, number>();
@@ -71,107 +97,129 @@ export default function ProductCatalog() {
     return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   }, []);
 
-  const filtered = useMemo(() => {
+  const searchResults = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return allProducts.filter((product) => {
-      const categoryMatch = category === "All products" || product.category === category;
-      const searchMatch =
-        !needle ||
-        product.name.toLowerCase().includes(needle) ||
-        product.id.toLowerCase().includes(needle);
-      return categoryMatch && searchMatch;
-    });
-  }, [query, category]);
+    if (!needle) return [];
 
-  const shown = filtered.slice(0, visible);
+    return allProducts
+      .filter(
+        (product) =>
+          product.name.toLowerCase().includes(needle) ||
+          product.id.toLowerCase().includes(needle)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [query]);
 
-  function chooseCategory(value: string) {
-    setCategory(value);
-    setVisible(60);
+  const categoryProducts = useMemo(() => {
+    if (!selectedCategory) return [];
+    return allProducts
+      .filter((product) => product.category === selectedCategory)
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [selectedCategory]);
+
+  const hasSearch = query.trim().length > 0;
+
+  function openCategory(category: string) {
+    setQuery("");
+    setSelectedCategory(category);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showCategories() {
+    setSelectedCategory(null);
   }
 
   return (
     <div className="catalog-browser">
-      <div className="catalog-toolbar">
-        <label className="search-box">
-          <span>Search products</span>
+      <label className="catalog-search">
+        <span>Search the catalog</span>
+        <div className="catalog-search-field">
+          <span aria-hidden="true">⌕</span>
           <input
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
-              setVisible(60);
+              setSelectedCategory(null);
             }}
-            placeholder="Search by product name or item ID"
+            placeholder="Search by product name or item number"
           />
-        </label>
-
-        <label className="category-select">
-          <span>Category</span>
-          <select value={category} onChange={(e) => chooseCategory(e.target.value)}>
-            <option>All products</option>
-            {categories.map(([name, count]) => (
-              <option value={name} key={name}>
-                {name} ({count})
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="category-chips" aria-label="Product categories">
-        <button
-          className={category === "All products" ? "active" : ""}
-          onClick={() => chooseCategory("All products")}
-        >
-          All <span>{allProducts.length}</span>
-        </button>
-        {categories.map(([name, count]) => (
-          <button
-            className={category === name ? "active" : ""}
-            onClick={() => chooseCategory(name)}
-            key={name}
-          >
-            {name} <span>{count}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="catalog-results-heading">
-        <div>
-          <p className="eyebrow">Catalog</p>
-          <h2>{category}</h2>
+          {hasSearch && (
+            <button type="button" onClick={() => setQuery("")}>
+              Clear
+            </button>
+          )}
         </div>
-        <p>{filtered.length.toLocaleString()} products</p>
-      </div>
+      </label>
 
-      {shown.length ? (
-        <>
-          <div className="real-product-grid">
-            {shown.map((product) => (
-              <article className="real-product-card" key={product.id}>
-                <div className="product-card-meta">
-                  <span>{product.category}</span>
-                  <span>#{product.id}</span>
-                </div>
-                <h3>{product.name}</h3>
-                <Price product={product} />
-              </article>
-            ))}
+      {hasSearch ? (
+        <section className="catalog-list-view">
+          <div className="catalog-view-heading">
+            <div>
+              <p className="eyebrow">Search results</p>
+              <h2>Results for “{query.trim()}”</h2>
+            </div>
+            <p>{searchResults.length.toLocaleString()} items</p>
           </div>
 
-          {visible < filtered.length && (
-            <div className="load-more-wrap">
-              <button className="button button-secondary" onClick={() => setVisible(v => v + 60)}>
-                Show more products
-              </button>
+          {searchResults.length ? (
+            <ProductTable items={searchResults} showCategory />
+          ) : (
+            <div className="no-results">
+              <h3>No products found</h3>
+              <p>Try a different product name or item number.</p>
             </div>
           )}
-        </>
+        </section>
+      ) : selectedCategory ? (
+        <section className="catalog-list-view">
+          <button className="back-to-categories" type="button" onClick={showCategories}>
+            ← All categories
+          </button>
+
+          <div className="catalog-view-heading">
+            <div>
+              <p className="eyebrow">Product category</p>
+              <h2>{selectedCategory}</h2>
+              <p className="category-view-description">
+                {categoryDescriptions[selectedCategory]}
+              </p>
+            </div>
+            <p>{categoryProducts.length.toLocaleString()} items</p>
+          </div>
+
+          <ProductTable items={categoryProducts} />
+        </section>
       ) : (
-        <div className="no-results">
-          <h3>No products found</h3>
-          <p>Try another search or category.</p>
-        </div>
+        <section className="category-browser">
+          <div className="catalog-view-heading category-heading">
+            <div>
+              <p className="eyebrow">Browse by category</p>
+              <h2>What are you looking for?</h2>
+            </div>
+            <p>{allProducts.length.toLocaleString()} products</p>
+          </div>
+
+          <div className="category-card-grid">
+            {categories.map(([category, count]) => (
+              <button
+                className="catalog-category-card"
+                type="button"
+                onClick={() => openCategory(category)}
+                key={category}
+              >
+                <div>
+                  <span className="category-count">{count.toLocaleString()} items</span>
+                  <h3>{category}</h3>
+                  <p>
+                    {categoryDescriptions[category] ??
+                      "Browse products currently available in this category."}
+                  </p>
+                </div>
+                <span className="category-arrow" aria-hidden="true">→</span>
+              </button>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
