@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | Brown Derby Wholesale",
   },
   description:
-    "Brown Derby Wholesale — family-run wholesale distribution serving Central Newfoundland since 1954.",
+    "Brown Derby Wholesale — serving Central Newfoundland from Grand Falls-Windsor since 1943.",
 };
 
 export default function RootLayout({
@@ -53,30 +53,30 @@ export default function RootLayout({
                   className="footer-logo"
                 />
               </Link>
-              <p className="footer-tagline">A handshake you can rely on since 1954.</p>
+              <p className="footer-tagline">Serving Central Newfoundland since 1943.</p>
               <p>
-                Family-run wholesale distribution serving grocers, restaurants,
-                convenience stores, and institutions across Central Newfoundland.
+                Wholesale products and dependable service from Grand Falls-Windsor,
+                Newfoundland and Labrador.
               </p>
             </div>
 
             <div className="footer-info-column">
               <h3>Visit</h3>
               <address>
-                142 Cromer Avenue<br />
+                22 Hardy Avenue<br />
                 Grand Falls-Windsor, NL<br />
-                A2A 1X3
+                A2A 2P9
               </address>
             </div>
 
             <div className="footer-info-column">
-              <h3>Trade desk</h3>
+              <h3>Contact & hours</h3>
               <div className="footer-hours">
-                <span>Mon–Fri · 7:00–5:00</span>
-                <span>Sat · 8:00–12:00</span>
+                <span>Mon–Fri · 8:00–5:00</span>
+                <span>Sat–Sun · Closed</span>
               </div>
-              <a href="tel:+17094896000">(709) 489-6000</a>
-              <a href="mailto:trade@browndurby.ca">trade@browndurby.ca</a>
+              <a href="tel:+17094892299">(709) 489-2299</a>
+              <a href="mailto:csr@brownderby.ca">csr@brownderby.ca</a>
             </div>
 
             <div className="footer-info-column footer-links">
@@ -89,7 +89,7 @@ export default function RootLayout({
 
           <div className="shell footer-bottom">
             <span>© {new Date().getFullYear()} Brown Derby Wholesale Ltd. · Newfoundland & Labrador</span>
-            <Link href="/contact">Apply for an account</Link>
+            <Link href="/contact">Become a customer</Link>
           </div>
         </footer>
       </body>
