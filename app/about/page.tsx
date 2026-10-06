@@ -1,9 +1,7 @@
 export default function AboutPage() {
   const stats = [
-    { value: "1954", label: "Established" },
-    { value: "9,000+", label: "Products stocked" },
-    { value: "14", label: "Active routes" },
-    { value: "320+", label: "Trade partners" },
+    { value: "1943", label: "Established" },
+    { value: "3,000+", label: "Items carried" },
   ];
 
   return (
@@ -11,10 +9,11 @@ export default function AboutPage() {
       <section className="page-hero about-page-hero">
         <div className="shell">
           <p className="eyebrow">Our history</p>
-          <h1>Seven decades of honest trade in Central Newfoundland.</h1>
+          <h1>Serving Central Newfoundland since 1943.</h1>
           <p>
-            Brown Derby Wholesale has served merchants, restaurants, convenience
-            stores, and institutions from Grand Falls-Windsor since 1954.
+            Brown Derby Wholesale has been part of the Grand Falls-Windsor business
+            community for more than 80 years, supplying local businesses with the
+            products they rely on every day.
           </p>
         </div>
       </section>
@@ -23,27 +22,29 @@ export default function AboutPage() {
         <div className="shell about-story-grid">
           <aside className="about-year-card">
             <span>Since</span>
-            <strong>1954</strong>
-            <p>A family-run wholesale business built around long-term relationships.</p>
+            <strong>1943</strong>
+            <p>
+              Decades of wholesale experience, dependable service, and strong local
+              business relationships.
+            </p>
           </aside>
 
           <div className="about-story-copy">
             <p>
-              Brown Derby Wholesale opened its doors in Grand Falls-Windsor in 1954,
-              founded on a simple conviction: that the merchants and restaurateurs of
-              Central Newfoundland deserved a supplier who knew them by name.
+              Brown Derby Wholesale was established in Grand Falls-Windsor in 1943.
+              Since then, the business has grown alongside the customers and
+              communities it serves throughout Central Newfoundland.
             </p>
             <p>
-              Three generations later, that conviction still anchors every decision we
-              make — from the relationships we cultivate with growers and manufacturers,
-              to the routes our drivers run each week from Twillingate to Buchans,
-              Glenwood to Springdale.
+              Today, Brown Derby carries more than 3,000 items across a wide range of
+              wholesale categories, including food and grocery, beverages, candy and
+              snacks, packaging and disposables, cleaning and janitorial supplies,
+              restaurant smallwares, general merchandise, and more.
             </p>
             <p>
-              Today we stock over nine thousand SKUs across pantry provisions,
-              beverages, sanitary supplies, general merchandise, and other wholesale
-              categories — all at the trade prices our partners depend on to help their
-              own businesses thrive.
+              While the business has changed over the years, the goal remains simple:
+              make it easier for customers to get the products they need at dependable
+              wholesale pricing, backed by practical, responsive service.
             </p>
           </div>
         </div>
@@ -64,11 +65,11 @@ export default function AboutPage() {
         <div className="shell">
           <div className="section-heading">
             <p className="eyebrow">How we work</p>
-            <h2>Built around relationships, reliability, and practical service.</h2>
+            <h2>Dependable wholesale supply with a local connection.</h2>
             <p>
-              Brown Derby Wholesale remains focused on the same thing that built the
-              business in the first place: knowing our customers, carrying the products
-              they rely on, and being dependable when they need us.
+              Brown Derby Wholesale is focused on knowing its customers, carrying the
+              products they need, and providing straightforward service from its
+              Grand Falls-Windsor location.
             </p>
           </div>
         </div>
