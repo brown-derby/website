@@ -55,7 +55,7 @@ export default function HomePage() {
         <div className="shell trust-grid">
           <span>Brown Derby Wholesale Ltd.</span>
           <span>Serving business customers from Central Newfoundland</span>
-          <span>Serving Central Newfoundland since 1954</span>
+          <span>Serving Central Newfoundland since 1943</span>
         </div>
       </section>
 
@@ -101,14 +101,13 @@ export default function HomePage() {
 
       <section className="section heritage-section">
         <div className="shell heritage-grid">
-          <div className="heritage-date">1954</div>
+          <div className="heritage-date">1943</div>
           <div>
             <p className="eyebrow">Our roots</p>
             <h2>Born from supplying local businesses.</h2>
             <p>
-              Brown Derby Wholesale opened in Grand Falls-Windsor in 1954 and has grown through
-              three generations of serving merchants, restaurants, convenience stores,
-              and institutions across Central Newfoundland.
+              Brown Derby Wholesale was established in Grand Falls-Windsor in 1943 and has spent
+              more than 80 years supplying businesses throughout Central Newfoundland.
             </p>
             <Link className="text-link" href="/about">
               Read our story →
