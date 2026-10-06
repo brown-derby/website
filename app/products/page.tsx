@@ -8,22 +8,14 @@ export default function ProductsPage() {
           <p className="eyebrow">Products</p>
           <h1>Browse the Brown Derby catalog.</h1>
           <p>
-            Search our product list or browse by category. Prices shown are the
-            prices currently present in Brown Derby&apos;s supplied price list.
+            Search by product name or item number, or browse our catalog by category.
+            Select a category to see its full price list.
           </p>
         </div>
       </section>
 
       <section className="catalog-shell">
         <div className="shell">
-          <div className="pricing-note">
-            <strong>About pricing</strong>
-            <p>
-              Most items have one clear price. Where the source file contains two
-              different price records, both are shown while we confirm which price
-              should be published as the current customer price.
-            </p>
-          </div>
           <ProductCatalog />
         </div>
       </section>
