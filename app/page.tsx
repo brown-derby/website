@@ -41,11 +41,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="hero-mark" aria-hidden="true">
-            <div className="hero-mark-inner">
-              <span>BD</span>
-              <small>Wholesale</small>
-            </div>
+          <div className="hero-logo-panel">
+            <img
+              src="/brown-derby-logo.svg"
+              alt="Brown Derby Wholesale"
+              className="hero-logo"
+            />
           </div>
         </div>
       </section>
@@ -87,9 +88,9 @@ export default function HomePage() {
             <p className="eyebrow light">Product catalog</p>
             <h2>See what Brown Derby carries.</h2>
             <p>
-              The catalog structure is live now. The next step is connecting Brown
-              Derby&apos;s real product data so customers can browse actual items,
-              categories, and availability.
+              Browse Brown Derby&apos;s current published catalog by category, search
+              by product name or item number, and see pricing for more than 2,500
+              products.
             </p>
           </div>
           <Link className="button button-light" href="/products">
