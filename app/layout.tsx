@@ -21,12 +21,12 @@ export default function RootLayout({
       <body>
         <header className="site-header">
           <div className="shell header-inner">
-            <Link className="brand" href="/" aria-label="Brown Derby Wholesale home">
-              <span className="brand-seal" aria-hidden="true">BD</span>
-              <span className="brand-copy">
-                <strong>Brown Derby</strong>
-                <small>Wholesale</small>
-              </span>
+            <Link className="brand-logo-link" href="/" aria-label="Brown Derby Wholesale home">
+              <img
+                src="/brown-derby-logo.svg"
+                alt="Brown Derby Wholesale"
+                className="site-logo"
+              />
             </Link>
 
             <nav className="main-nav" aria-label="Main navigation">
@@ -46,7 +46,13 @@ export default function RootLayout({
         <footer className="site-footer">
           <div className="shell footer-grid">
             <div>
-              <div className="footer-brand">Brown Derby Wholesale</div>
+              <Link className="footer-logo-link" href="/" aria-label="Brown Derby Wholesale home">
+                <img
+                  src="/brown-derby-logo.svg"
+                  alt="Brown Derby Wholesale"
+                  className="footer-logo"
+                />
+              </Link>
               <p>Wholesale supply from Grand Falls-Windsor, Newfoundland and Labrador.</p>
             </div>
 
