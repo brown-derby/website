@@ -1,133 +1,117 @@
 import Link from "next/link";
 
-const workstreams = [
+const highlights = [
   {
-    eyebrow: "Minitools",
-    title: "Fast utilities for everyday work",
-    description:
-      "PDF splitting, file renaming, document cleanup, and other small tools that remove repetitive bookkeeping steps.",
-    status: "Building",
+    number: "01",
+    title: "Wholesale supply",
+    text: "A practical source for businesses that need dependable access to the products they use and resell.",
   },
   {
-    eyebrow: "Accounting",
-    title: "Workflow support around Sage",
-    description:
-      "Turn recurring bookkeeping procedures into clear, repeatable workflows and automation opportunities.",
-    status: "Planned",
+    number: "02",
+    title: "Local experience",
+    text: "Brown Derby has deep roots in Grand Falls-Windsor and generations of experience serving business customers.",
   },
   {
-    eyebrow: "Operations",
-    title: "One place to run Brown Derby",
-    description:
-      "A growing internal home for tools, process knowledge, integrations, and operational shortcuts.",
-    status: "Foundation",
+    number: "03",
+    title: "A better way to order",
+    text: "We are building this site into a full online catalog so customers can browse, reorder, and manage purchases more easily.",
   },
 ];
 
 export default function HomePage() {
-  const commit = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local";
-
   return (
     <>
       <section className="hero">
-        <div className="shell hero-grid">
-          <div>
-            <p className="kicker">Brown Derby Wholesale · Internal Operations</p>
-            <h1>Less clicking. Less repetition. More work done.</h1>
-            <p className="hero-copy">
-              This is the home base for the tools and workflows we build to simplify
-              Brown Derby&apos;s day-to-day operations.
+        <div className="shell hero-layout">
+          <div className="hero-copy-block">
+            <p className="eyebrow">Grand Falls-Windsor · Newfoundland & Labrador</p>
+            <h1>Wholesale, made easier.</h1>
+            <p className="hero-lede">
+              Brown Derby Wholesale is building a better way for customers to discover
+              products, check what we carry, and eventually place orders online.
             </p>
-            <div className="button-row">
-              <Link className="button primary" href="/tools">
-                Open tools
+
+            <div className="hero-actions">
+              <Link className="button button-primary" href="/products">
+                Browse products
               </Link>
-              <a className="button secondary" href="/api/health">
-                Check system health
-              </a>
+              <Link className="button button-secondary" href="/contact">
+                Talk to our team
+              </Link>
             </div>
           </div>
 
-          <aside className="status-panel" aria-label="Deployment status">
-            <div className="status-heading">
-              <span className="status-dot" />
-              <span>Foundation online</span>
+          <div className="hero-mark" aria-hidden="true">
+            <div className="hero-mark-inner">
+              <span>BD</span>
+              <small>Wholesale</small>
             </div>
-            <dl className="status-list">
-              <div>
-                <dt>Application</dt>
-                <dd>Next.js</dd>
-              </div>
-              <div>
-                <dt>Production source</dt>
-                <dd>main</dd>
-              </div>
-              <div>
-                <dt>Build</dt>
-                <dd>{commit}</dd>
-              </div>
-            </dl>
-            <p>
-              Production will deploy from <code>main</code>. Feature work will be
-              reviewed in preview deployments before it is promoted.
-            </p>
-          </aside>
+          </div>
+        </div>
+      </section>
+
+      <section className="trust-strip">
+        <div className="shell trust-grid">
+          <span>Brown Derby Wholesale Ltd.</span>
+          <span>Serving business customers from Central Newfoundland</span>
+          <span>Roots dating back to the 1940s</span>
         </div>
       </section>
 
       <section className="section">
         <div className="shell">
           <div className="section-heading">
-            <div>
-              <p className="kicker">Current direction</p>
-              <h2>One platform, built a useful piece at a time.</h2>
-            </div>
+            <p className="eyebrow">What we&apos;re building</p>
+            <h2>A customer website that becomes more useful over time.</h2>
             <p>
-              We&apos;re starting with a dependable deployment foundation, then adding
-              the tools that save the most time.
+              The first goal is a clear, branded catalog. From there, the site can
+              grow into customer accounts, pricing, saved orders, and online checkout.
             </p>
           </div>
 
-          <div className="card-grid">
-            {workstreams.map((item) => (
-              <article className="card" key={item.title}>
-                <div className="card-topline">
-                  <span>{item.eyebrow}</span>
-                  <span className="pill">{item.status}</span>
-                </div>
+          <div className="feature-grid">
+            {highlights.map((item) => (
+              <article className="feature-card" key={item.number}>
+                <span className="feature-number">{item.number}</span>
                 <h3>{item.title}</h3>
-                <p>{item.description}</p>
+                <p>{item.text}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section section-muted">
-        <div className="shell split">
+      <section className="catalog-band">
+        <div className="shell catalog-band-grid">
           <div>
-            <p className="kicker">How we ship</p>
-            <h2>Production stays stable while the platform keeps moving.</h2>
+            <p className="eyebrow light">Product catalog</p>
+            <h2>See what Brown Derby carries.</h2>
+            <p>
+              The catalog structure is live now. The next step is connecting Brown
+              Derby&apos;s real product data so customers can browse actual items,
+              categories, and availability.
+            </p>
           </div>
-          <div className="steps">
-            <div>
-              <span>01</span>
-              <p>
-                <strong>Build on a branch.</strong> New work stays isolated from production.
-              </p>
-            </div>
-            <div>
-              <span>02</span>
-              <p>
-                <strong>Verify the preview.</strong> CI and Vercel previews catch problems early.
-              </p>
-            </div>
-            <div>
-              <span>03</span>
-              <p>
-                <strong>Merge to main.</strong> Stable work becomes the production version.
-              </p>
-            </div>
+          <Link className="button button-light" href="/products">
+            Open catalog
+          </Link>
+        </div>
+      </section>
+
+      <section className="section heritage-section">
+        <div className="shell heritage-grid">
+          <div className="heritage-date">1940s</div>
+          <div>
+            <p className="eyebrow">Our roots</p>
+            <h2>Born from supplying local businesses.</h2>
+            <p>
+              Brown Derby&apos;s wholesale story grew out of the original Brown Derby
+              business in Grand Falls-Windsor. What began with bringing products in
+              for the business expanded into supplying other local stores.
+            </p>
+            <Link className="text-link" href="/about">
+              Read our story →
+            </Link>
           </div>
         </div>
       </section>
