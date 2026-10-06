@@ -1,27 +1,14 @@
 {
   "name": "website",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "Brown Derby Wholesale operations and automation hub",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "check": "tsc --noEmit"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/brown-derby/website.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/brown-derby/website/issues"
-  },
-  "homepage": "https://github.com/brown-derby/website#readme",
   "dependencies": {
     "next": "^16.2.4",
     "react": "^19.2.5",
