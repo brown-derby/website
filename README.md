@@ -1,29 +1,28 @@
-# Brown Derby Wholesale Operations Hub
+# Brown Derby Wholesale Website
 
-This repository is the foundation for Brown Derby Wholesale's internal operations and automation platform.
+Customer-facing website for Brown Derby Wholesale Ltd.
 
 ## Purpose
 
-The goal is to give Brown Derby one dependable place for small utilities, bookkeeping workflow helpers, process knowledge, and future integrations.
+This repository is for the public Brown Derby website: brand, company information, product discovery, and the foundation for future customer accounts and online ordering.
 
-The first utilities are expected to focus on repetitive document work such as PDF splitting and batch file renaming.
+Internal bookkeeping and automation tools should live in a separate application/project.
 
-## Deployment model
+## Current milestone
 
-- `main` is the production source of truth.
-- Feature work is developed on branches.
-- Pull requests run CI before merge.
-- Vercel is the production host.
-- Once Git integration is connected, pull requests receive Vercel preview deployments and `main` deploys to production.
+1. Branded public website
+2. Product catalog structure
+3. Real Brown Derby product data
+4. Customer account/login
+5. Customer-specific pricing and ordering
+6. Order submission and back-office integration
 
-## Local development
+## Development
 
 ```bash
 npm ci
 npm run dev
 ```
-
-Open http://localhost:3000.
 
 ## Verification
 
@@ -32,14 +31,4 @@ npm run check
 npm run build
 ```
 
-The application also exposes `/api/health` for a lightweight deployment health check.
-
-## Current milestone
-
-**Milestone 1: Production foundation**
-
-1. Clean Next.js application structure
-2. CI build gate
-3. Vercel Git deployment
-4. Stable production URL
-5. First useful Brown Derby minitool
+Production is deployed from `main` through Vercel. Feature work should be reviewed on branches before promotion.
