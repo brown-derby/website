@@ -7,7 +7,7 @@ export default function ContactPage() {
           <h1>Talk to Brown Derby.</h1>
           <p>
             Questions about products, availability, becoming a customer, or an
-            existing order? Reach Brown Derby Wholesale in Grand Falls-Windsor.
+            existing order? Reach our trade desk in Grand Falls-Windsor.
           </p>
         </div>
       </section>
@@ -17,9 +17,13 @@ export default function ContactPage() {
           <div className="contact-copy">
             <h2>We&apos;re here to help.</h2>
             <p>
-              The online catalog and ordering experience are being built now. Until
-              those tools are fully connected, customers can continue to contact Brown
-              Derby directly.
+              Whether you&apos;re already a Brown Derby customer or looking to open a
+              trade account, our team can help with products, pricing, ordering, and
+              route information.
+            </p>
+            <p>
+              Our online catalog is available now, with more ordering features planned
+              as the website grows.
             </p>
           </div>
 
@@ -31,11 +35,25 @@ export default function ContactPage() {
               </div>
               <div>
                 <dt>Address</dt>
-                <dd>22 Hardy Avenue<br />Grand Falls-Windsor, NL A2A 2P9</dd>
+                <dd>
+                  142 Cromer Avenue<br />
+                  Grand Falls-Windsor, NL A2A 1X3
+                </dd>
               </div>
               <div>
-                <dt>Phone</dt>
-                <dd><a href="tel:+17094892299">709-489-2299</a></dd>
+                <dt>Trade desk</dt>
+                <dd><a href="tel:+17094896000">(709) 489-6000</a></dd>
+              </div>
+              <div>
+                <dt>Email</dt>
+                <dd><a href="mailto:trade@browndurby.ca">trade@browndurby.ca</a></dd>
+              </div>
+              <div>
+                <dt>Hours</dt>
+                <dd>
+                  Monday–Friday · 7:00–5:00<br />
+                  Saturday · 8:00–12:00
+                </dd>
               </div>
             </dl>
           </div>
