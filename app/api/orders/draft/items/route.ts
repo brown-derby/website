@@ -29,7 +29,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const order = await setDraftItem(session.user, productId, quantity);
+    const order = await setDraftItem(
+      session.user,
+      session.accessToken,
+      productId,
+      quantity
+    );
     return NextResponse.json({ order });
   } catch {
     return NextResponse.json({ error: "Unable to update the order." }, { status: 502 });
