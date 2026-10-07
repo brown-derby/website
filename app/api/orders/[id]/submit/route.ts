@@ -31,7 +31,11 @@ export async function POST(
   }
 
   const { id } = await context.params;
-  const order = await getOrderForUser(session.user.id, id).catch(() => null);
+  const order = await getOrderForUser(
+    session.user.id,
+    id,
+    session.accessToken
+  ).catch(() => null);
 
   if (!order || order.status !== "draft") {
     return NextResponse.json({ error: "Draft order not found." }, { status: 404 });
@@ -46,6 +50,7 @@ export async function POST(
     const submittedAt = new Date().toISOString();
     const response = await databaseRequest(
       "orders?id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(session.user.id),
+      session.accessToken,
       {
         method: "PATCH",
         headers: { Prefer: "return=representation" },
@@ -64,6 +69,7 @@ export async function POST(
   } catch {
     await databaseRequest(
       "orders?id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(session.user.id),
+      session.accessToken,
       {
         method: "PATCH",
         body: JSON.stringify({ email_status: "failed" }),
