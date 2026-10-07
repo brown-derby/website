@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   emailOrder,
   getOrderForUser,
+  repriceDraftOrder,
   type CustomerOrder,
 } from "../../../../../lib/order-server";
 import {
@@ -45,7 +46,14 @@ export async function POST(
   }
 
   try {
-    await emailOrder(order);
+    const currentOrder = await repriceDraftOrder(
+      session.user.id,
+      id,
+      session.accessToken
+    );
+    if (!currentOrder) throw new Error("Unable to refresh order prices.");
+
+    await emailOrder(currentOrder);
 
     const submittedAt = new Date().toISOString();
     const response = await databaseRequest(
