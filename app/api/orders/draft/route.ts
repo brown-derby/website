@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   try {
-    const order = await getDraftForUser(session.user.id);
+    const order = await getDraftForUser(session.user.id, session.accessToken);
     return NextResponse.json({ order });
   } catch {
     return NextResponse.json({ error: "Unable to load the draft order." }, { status: 502 });
@@ -34,7 +34,11 @@ export async function PATCH(request: NextRequest) {
   const notes = typeof body?.notes === "string" ? body.notes.trim().slice(0, 2000) : "";
 
   try {
-    const order = await updateDraftNotes(session.user.id, notes);
+    const order = await updateDraftNotes(
+      session.user.id,
+      session.accessToken,
+      notes
+    );
     return NextResponse.json({ order });
   } catch {
     return NextResponse.json({ error: "Unable to save order notes." }, { status: 502 });
