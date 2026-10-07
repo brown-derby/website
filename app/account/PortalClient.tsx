@@ -58,6 +58,7 @@ export default function PortalClient() {
   const [error, setError] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [notes, setNotes] = useState("");
+  const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
 
   const draft = useMemo(
     () => orders.find((order) => order.status === "draft") || null,
@@ -176,7 +177,6 @@ export default function PortalClient() {
 
   async function submitOrder() {
     if (!draft) return;
-    if (!window.confirm("Send this order to Brown Derby now?")) return;
 
     setWorking("submit");
     setError("");
@@ -204,6 +204,7 @@ export default function PortalClient() {
       return;
     }
 
+    setSubmitConfirmOpen(false);
     setMessage("Order sent to Brown Derby at csr@brownderby.ca.");
     await loadPortal();
   }
@@ -351,7 +352,7 @@ export default function PortalClient() {
                 <button
                   className="button button-primary"
                   type="button"
-                  onClick={submitOrder}
+                  onClick={() => setSubmitConfirmOpen(true)}
                   disabled={working === "submit"}
                 >
                   {working === "submit" ? "Sending order…" : "Submit order"}
@@ -361,6 +362,73 @@ export default function PortalClient() {
           </>
         )}
       </section>
+
+      {submitConfirmOpen && draft && (
+        <div
+          className="order-confirm-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && working !== "submit") {
+              setSubmitConfirmOpen(false);
+            }
+          }}
+        >
+          <div
+            className="order-confirm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="order-confirm-title"
+          >
+            <div className="order-confirm-brand">
+              <span>Brown Derby</span>
+              <small>Wholesale</small>
+            </div>
+
+            <div className="order-confirm-content">
+              <p className="eyebrow">Confirm order</p>
+              <h2 id="order-confirm-title">Ready to send this order?</h2>
+              <p>
+                Your order will be sent to Brown Derby Wholesale for review and
+                processing. Submitted orders are kept in your account history.
+              </p>
+
+              <div className="order-confirm-summary">
+                <div>
+                  <span>Items</span>
+                  <strong>{(draft.order_items || []).length.toLocaleString()}</strong>
+                </div>
+                <div>
+                  <span>Estimated total</span>
+                  <strong>{money.format(orderTotal(draft))}</strong>
+                </div>
+              </div>
+
+              <div className="order-confirm-notice">
+                Final availability and pricing will be confirmed by Brown Derby.
+              </div>
+
+              <div className="order-confirm-actions">
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={() => setSubmitConfirmOpen(false)}
+                  disabled={working === "submit"}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="button button-primary"
+                  onClick={submitOrder}
+                  disabled={working === "submit"}
+                >
+                  {working === "submit" ? "Sending order…" : "Send order"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="order-history-section">
         <div className="portal-section-heading">
