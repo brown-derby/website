@@ -57,11 +57,88 @@ for each row execute function public.touch_order_updated_at();
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 
--- Browser clients do not access these tables directly. All order access goes
--- through authenticated Next.js server routes, which verify the Supabase user
--- and then scope every query to that user's UUID.
-revoke all on public.orders from anon, authenticated;
-revoke all on public.order_items from anon, authenticated;
-grant all on public.orders to service_role;
-grant all on public.order_items to service_role;
-grant usage, select on all sequences in schema public to service_role;
+-- Customer requests reach these tables through authenticated Next.js server
+-- routes using the customer's own Supabase access token. Row Level Security is
+-- therefore the final authorization boundary as well as the application checks.
+
+drop policy if exists "customers_select_own_orders" on public.orders;
+create policy "customers_select_own_orders"
+on public.orders for select
+to authenticated
+using (user_id = auth.uid());
+
+drop policy if exists "customers_insert_own_orders" on public.orders;
+create policy "customers_insert_own_orders"
+on public.orders for insert
+to authenticated
+with check (user_id = auth.uid());
+
+drop policy if exists "customers_update_own_drafts" on public.orders;
+create policy "customers_update_own_drafts"
+on public.orders for update
+to authenticated
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+drop policy if exists "customers_select_own_order_items" on public.order_items;
+create policy "customers_select_own_order_items"
+on public.order_items for select
+to authenticated
+using (
+  exists (
+    select 1 from public.orders
+    where orders.id = order_items.order_id
+      and orders.user_id = auth.uid()
+  )
+);
+
+drop policy if exists "customers_insert_own_order_items" on public.order_items;
+create policy "customers_insert_own_order_items"
+on public.order_items for insert
+to authenticated
+with check (
+  exists (
+    select 1 from public.orders
+    where orders.id = order_items.order_id
+      and orders.user_id = auth.uid()
+      and orders.status = 'draft'
+  )
+);
+
+drop policy if exists "customers_update_own_order_items" on public.order_items;
+create policy "customers_update_own_order_items"
+on public.order_items for update
+to authenticated
+using (
+  exists (
+    select 1 from public.orders
+    where orders.id = order_items.order_id
+      and orders.user_id = auth.uid()
+      and orders.status = 'draft'
+  )
+)
+with check (
+  exists (
+    select 1 from public.orders
+    where orders.id = order_items.order_id
+      and orders.user_id = auth.uid()
+      and orders.status = 'draft'
+  )
+);
+
+drop policy if exists "customers_delete_own_order_items" on public.order_items;
+create policy "customers_delete_own_order_items"
+on public.order_items for delete
+to authenticated
+using (
+  exists (
+    select 1 from public.orders
+    where orders.id = order_items.order_id
+      and orders.user_id = auth.uid()
+      and orders.status = 'draft'
+  )
+);
+
+grant select, insert, update on public.orders to authenticated;
+grant select, insert, update, delete on public.order_items to authenticated;
+grant usage, select on all sequences in schema public to authenticated;
