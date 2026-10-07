@@ -886,9 +886,16 @@ h2 {
   box-shadow: 0 16px 38px rgba(75,41,24,.08);
 }
 
+.category-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
 .category-count {
   display: block;
-  margin-bottom: 34px;
+  margin-top: auto;
+  padding-top: 30px;
   color: var(--rust);
   font-size: .72rem;
   font-weight: 800;
