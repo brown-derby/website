@@ -42,7 +42,8 @@ create index if not exists order_items_order_idx
 create or replace function public.touch_order_updated_at()
 returns trigger
 language plpgsql
-as $$
+set search_path = public
+as $
 begin
   new.updated_at = now();
   return new;
@@ -65,20 +66,20 @@ drop policy if exists "customers_select_own_orders" on public.orders;
 create policy "customers_select_own_orders"
 on public.orders for select
 to authenticated
-using (user_id = auth.uid());
+using (user_id = (select auth.uid()));
 
 drop policy if exists "customers_insert_own_orders" on public.orders;
 create policy "customers_insert_own_orders"
 on public.orders for insert
 to authenticated
-with check (user_id = auth.uid());
+with check (user_id = (select auth.uid()));
 
 drop policy if exists "customers_update_own_drafts" on public.orders;
 create policy "customers_update_own_drafts"
 on public.orders for update
 to authenticated
-using (user_id = auth.uid())
-with check (user_id = auth.uid());
+using (user_id = (select auth.uid()))
+with check (user_id = (select auth.uid()));
 
 drop policy if exists "customers_select_own_order_items" on public.order_items;
 create policy "customers_select_own_order_items"
@@ -88,7 +89,7 @@ using (
   exists (
     select 1 from public.orders
     where orders.id = order_items.order_id
-      and orders.user_id = auth.uid()
+      and orders.user_id = (select auth.uid())
   )
 );
 
@@ -100,7 +101,7 @@ with check (
   exists (
     select 1 from public.orders
     where orders.id = order_items.order_id
-      and orders.user_id = auth.uid()
+      and orders.user_id = (select auth.uid())
       and orders.status = 'draft'
   )
 );
@@ -113,7 +114,7 @@ using (
   exists (
     select 1 from public.orders
     where orders.id = order_items.order_id
-      and orders.user_id = auth.uid()
+      and orders.user_id = (select auth.uid())
       and orders.status = 'draft'
   )
 )
@@ -121,7 +122,7 @@ with check (
   exists (
     select 1 from public.orders
     where orders.id = order_items.order_id
-      and orders.user_id = auth.uid()
+      and orders.user_id = (select auth.uid())
       and orders.status = 'draft'
   )
 );
@@ -134,7 +135,7 @@ using (
   exists (
     select 1 from public.orders
     where orders.id = order_items.order_id
-      and orders.user_id = auth.uid()
+      and orders.user_id = (select auth.uid())
       and orders.status = 'draft'
   )
 );
