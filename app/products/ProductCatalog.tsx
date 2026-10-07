@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import products from "../../data/products.json";
 
 type Product = {
@@ -8,6 +9,20 @@ type Product = {
   name: string;
   category: string;
   websitePrice: number;
+};
+
+type PortalUser = {
+  email: string;
+  businessName: string;
+  contactName: string;
+};
+
+type DraftOrder = {
+  id: string;
+  order_items?: Array<{
+    product_id: string;
+    quantity: number;
+  }>;
 };
 
 const allProducts = products as Product[];
@@ -55,9 +70,19 @@ const money = new Intl.NumberFormat("en-CA", {
 function ProductTable({
   items,
   showCategory = false,
+  orderEnabled,
+  quantities,
+  savingProduct,
+  onQuantityChange,
+  onSave,
 }: {
   items: Product[];
   showCategory?: boolean;
+  orderEnabled: boolean;
+  quantities: Record<string, number>;
+  savingProduct: string;
+  onQuantityChange: (productId: string, quantity: number) => void;
+  onSave: (productId: string) => void;
 }) {
   return (
     <div className="product-table-wrap">
@@ -68,6 +93,7 @@ function ProductTable({
             <th>Product</th>
             {showCategory && <th>Category</th>}
             <th className="price-column">Price</th>
+            {orderEnabled && <th className="order-column">Order qty</th>}
           </tr>
         </thead>
         <tbody>
@@ -77,6 +103,39 @@ function ProductTable({
               <td className="product-name-cell">{product.name}</td>
               {showCategory && <td>{product.category}</td>}
               <td className="price-column">{money.format(product.websitePrice)}</td>
+              {orderEnabled && (
+                <td className="order-column">
+                  <div className="catalog-quantity-control">
+                    <input
+                      type="number"
+                      min={0}
+                      max={9999}
+                      step={1}
+                      aria-label={"Quantity for " + product.name}
+                      value={quantities[product.id] ?? 0}
+                      onChange={(event) =>
+                        onQuantityChange(
+                          product.id,
+                          Math.max(
+                            0,
+                            Math.min(
+                              9999,
+                              Math.trunc(Number(event.target.value) || 0)
+                            )
+                          )
+                        )
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={() => onSave(product.id)}
+                      disabled={savingProduct === product.id}
+                    >
+                      {savingProduct === product.id ? "Saving…" : "Save"}
+                    </button>
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -88,6 +147,12 @@ function ProductTable({
 export default function ProductCatalog() {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [user, setUser] = useState<PortalUser | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [savingProduct, setSavingProduct] = useState("");
+  const [orderMessage, setOrderMessage] = useState("");
+  const [orderError, setOrderError] = useState("");
 
   const categories = useMemo(() => {
     const counts = new Map<string, number>();
@@ -118,6 +183,48 @@ export default function ProductCatalog() {
   }, [selectedCategory]);
 
   const hasSearch = query.trim().length > 0;
+  const orderLineCount = Object.values(quantities).filter((quantity) => quantity > 0).length;
+
+  function syncDraft(order: DraftOrder | null) {
+    const next: Record<string, number> = {};
+    for (const item of order?.order_items || []) {
+      next[item.product_id] = item.quantity;
+    }
+    setQuantities(next);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPortalState() {
+      try {
+        const sessionResponse = await fetch("/api/auth/session", { cache: "no-store" });
+        if (!sessionResponse.ok) {
+          if (!cancelled) setSessionChecked(true);
+          return;
+        }
+
+        const sessionData = await sessionResponse.json();
+        if (cancelled) return;
+        setUser(sessionData.user);
+
+        const draftResponse = await fetch("/api/orders/draft", { cache: "no-store" });
+        if (draftResponse.ok) {
+          const draftData = await draftResponse.json();
+          if (!cancelled) syncDraft(draftData.order || null);
+        }
+      } catch {
+        // The public catalog remains fully usable when portal services are unavailable.
+      } finally {
+        if (!cancelled) setSessionChecked(true);
+      }
+    }
+
+    loadPortalState();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function openCategory(category: string) {
     setQuery("");
@@ -128,6 +235,42 @@ export default function ProductCatalog() {
   function showCategories() {
     setSelectedCategory(null);
   }
+
+  async function saveQuantity(productId: string) {
+    const quantity = quantities[productId] ?? 0;
+    setSavingProduct(productId);
+    setOrderError("");
+    setOrderMessage("");
+
+    const response = await fetch("/api/orders/draft/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId, quantity }),
+    });
+    const data = await response.json().catch(() => ({}));
+    setSavingProduct("");
+
+    if (!response.ok) {
+      setOrderError(data.error || "Unable to update your order.");
+      return;
+    }
+
+    syncDraft(data.order || null);
+    setOrderMessage(
+      quantity > 0
+        ? "Item saved to your current order."
+        : "Item removed from your current order."
+    );
+  }
+
+  const tableProps = {
+    orderEnabled: Boolean(user),
+    quantities,
+    savingProduct,
+    onQuantityChange: (productId: string, quantity: number) =>
+      setQuantities((current) => ({ ...current, [productId]: quantity })),
+    onSave: saveQuantity,
+  };
 
   return (
     <div className="catalog-browser">
@@ -151,6 +294,36 @@ export default function ProductCatalog() {
         </div>
       </label>
 
+      {sessionChecked && (
+        <div className={"catalog-order-bar " + (user ? "signed-in" : "")}>
+          {user ? (
+            <>
+              <div>
+                <strong>Ordering as {user.businessName || user.email}</strong>
+                <span>
+                  Enter a quantity beside any product and press Save. Use 0 to remove
+                  an item.
+                </span>
+              </div>
+              <Link href="/account">
+                View order{orderLineCount ? " · " + orderLineCount + " items" : ""}
+              </Link>
+            </>
+          ) : (
+            <>
+              <div>
+                <strong>Want to place an order?</strong>
+                <span>Sign in to add quantities directly from the catalog.</span>
+              </div>
+              <Link href="/login">Customer sign in →</Link>
+            </>
+          )}
+        </div>
+      )}
+
+      {orderMessage && <div className="portal-message success compact">{orderMessage}</div>}
+      {orderError && <div className="portal-message error compact">{orderError}</div>}
+
       {hasSearch ? (
         <section className="catalog-list-view">
           <div className="catalog-view-heading">
@@ -162,7 +335,7 @@ export default function ProductCatalog() {
           </div>
 
           {searchResults.length ? (
-            <ProductTable items={searchResults} showCategory />
+            <ProductTable items={searchResults} showCategory {...tableProps} />
           ) : (
             <div className="no-results">
               <h3>No products found</h3>
@@ -187,7 +360,7 @@ export default function ProductCatalog() {
             <p>{categoryProducts.length.toLocaleString()} items</p>
           </div>
 
-          <ProductTable items={categoryProducts} />
+          <ProductTable items={categoryProducts} {...tableProps} />
         </section>
       ) : (
         <section className="category-browser">
