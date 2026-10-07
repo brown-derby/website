@@ -710,12 +710,18 @@ h2 {
 
 @media (max-width: 620px) {
   .shell { width: min(100% - 28px, 1180px); }
-  .header-inner { min-height: 72px; }
-  .header-cta { display: none; }
+  .header-inner { min-height: 72px; gap: 12px; }
+  .header-cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 12px;
+    font-size: .75rem;
+    white-space: nowrap;
+  }
   h1 { font-size: clamp(3.35rem, 18vw, 5.1rem); }
   .hero { padding-top: 62px; }
   .section { padding: 72px 0; }
-  .site-logo { height: 64px; }
+  .site-logo { height: 56px; }
   .footer-logo { height: 72px; }
   .hero-logo-panel {
     min-height: 280px;
