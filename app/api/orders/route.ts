@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   try {
-    const orders = await getOrdersForUser(session.user.id);
+    const orders = await getOrdersForUser(session.user.id, session.accessToken);
     return NextResponse.json({ orders });
   } catch {
     return NextResponse.json({ error: "Unable to load orders." }, { status: 502 });
