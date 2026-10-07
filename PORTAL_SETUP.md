@@ -8,7 +8,7 @@ Required Vercel environment variables:
 - SUPABASE_URL
 - SUPABASE_ANON_KEY
 - RESEND_API_KEY
-- ORDER_EMAIL_FROM (for example: Brown Derby Orders <orders@brownderby.ca>)
+- ORDER_EMAIL_FROM (for example: Brown Derby Wholesale <csr@brownderby.ca>)
 - ORDER_EMAIL_TO (defaults to csr@brownderby.ca if omitted)
 - NEXT_PUBLIC_SITE_URL (production site URL)
 
