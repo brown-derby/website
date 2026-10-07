@@ -2,7 +2,7 @@
   "name": "website",
   "version": "1.0.0",
   "private": true,
-  "description": "Brown Derby Wholesale operations and automation hub",
+  "description": "Brown Derby Wholesale customer catalog and online ordering portal",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
