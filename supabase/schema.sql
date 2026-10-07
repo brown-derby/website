@@ -72,14 +72,22 @@ drop policy if exists "customers_insert_own_orders" on public.orders;
 create policy "customers_insert_own_orders"
 on public.orders for insert
 to authenticated
-with check (user_id = (select auth.uid()));
+with check (
+  user_id = (select auth.uid())
+  and status = 'draft'
+);
 
 drop policy if exists "customers_update_own_drafts" on public.orders;
 create policy "customers_update_own_drafts"
 on public.orders for update
 to authenticated
-using (user_id = (select auth.uid()))
-with check (user_id = (select auth.uid()));
+using (
+  user_id = (select auth.uid())
+  and status = 'draft'
+)
+with check (
+  user_id = (select auth.uid())
+);
 
 drop policy if exists "customers_select_own_order_items" on public.order_items;
 create policy "customers_select_own_order_items"
