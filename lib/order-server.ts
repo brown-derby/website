@@ -42,30 +42,32 @@ async function jsonOrThrow<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-export async function getOrdersForUser(userId: string) {
+export async function getOrdersForUser(userId: string, accessToken: string) {
   const response = await databaseRequest(
     "orders?select=" +
       encodeURIComponent(orderSelect) +
       "&user_id=eq." +
       encodeURIComponent(userId) +
-      "&order=created_at.desc"
+      "&order=created_at.desc",
+    accessToken
   );
   return jsonOrThrow<CustomerOrder[]>(response);
 }
 
-export async function getDraftForUser(userId: string) {
+export async function getDraftForUser(userId: string, accessToken: string) {
   const response = await databaseRequest(
     "orders?select=" +
       encodeURIComponent(orderSelect) +
       "&user_id=eq." +
       encodeURIComponent(userId) +
-      "&status=eq.draft&limit=1"
+      "&status=eq.draft&limit=1",
+    accessToken
   );
   const rows = await jsonOrThrow<CustomerOrder[]>(response);
   return rows[0] || null;
 }
 
-export async function getOrderForUser(userId: string, orderId: string) {
+export async function getOrderForUser(userId: string, orderId: string, accessToken: string) {
   const response = await databaseRequest(
     "orders?select=" +
       encodeURIComponent(orderSelect) +
@@ -73,18 +75,19 @@ export async function getOrderForUser(userId: string, orderId: string) {
       encodeURIComponent(userId) +
       "&id=eq." +
       encodeURIComponent(orderId) +
-      "&limit=1"
+      "&limit=1",
+    accessToken
   );
   const rows = await jsonOrThrow<CustomerOrder[]>(response);
   return rows[0] || null;
 }
 
-export async function ensureDraft(user: PortalUser) {
-  const existing = await getDraftForUser(user.id);
+export async function ensureDraft(user: PortalUser, accessToken: string) {
+  const existing = await getDraftForUser(user.id, accessToken);
   if (existing) return existing;
 
   const customer = customerSnapshot(user);
-  const response = await databaseRequest("orders", {
+  const response = await databaseRequest("orders", accessToken, {
     method: "POST",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({
@@ -104,13 +107,14 @@ export async function ensureDraft(user: PortalUser) {
 
 export async function setDraftItem(
   user: PortalUser,
+  accessToken: string,
   productId: string,
   quantity: number
 ) {
   const product = getCatalogProduct(productId);
   if (!product) throw new Error("Product not found.");
 
-  const draft = await ensureDraft(user);
+  const draft = await ensureDraft(user, accessToken);
 
   if (quantity === 0) {
     const response = await databaseRequest(
@@ -118,14 +122,16 @@ export async function setDraftItem(
         encodeURIComponent(draft.id) +
         "&product_id=eq." +
         encodeURIComponent(productId),
+      accessToken,
       { method: "DELETE" }
     );
     if (!response.ok) throw new Error("Unable to remove the item.");
-    return getDraftForUser(user.id);
+    return getDraftForUser(user.id, accessToken);
   }
 
   const response = await databaseRequest(
     "order_items?on_conflict=order_id,product_id",
+    accessToken,
     {
       method: "POST",
       headers: { Prefer: "resolution=merge-duplicates,return=representation" },
@@ -141,11 +147,11 @@ export async function setDraftItem(
   );
 
   await jsonOrThrow<OrderItem[]>(response);
-  return getDraftForUser(user.id);
+  return getDraftForUser(user.id, accessToken);
 }
 
-export async function updateDraftNotes(userId: string, notes: string) {
-  const draft = await getDraftForUser(userId);
+export async function updateDraftNotes(userId: string, accessToken: string, notes: string) {
+  const draft = await getDraftForUser(userId, accessToken);
   if (!draft) return null;
 
   const response = await databaseRequest(
@@ -154,6 +160,7 @@ export async function updateDraftNotes(userId: string, notes: string) {
       "&user_id=eq." +
       encodeURIComponent(userId) +
       "&status=eq.draft",
+    accessToken,
     {
       method: "PATCH",
       headers: { Prefer: "return=representation" },
