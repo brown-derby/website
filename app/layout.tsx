@@ -33,10 +33,11 @@ export default function RootLayout({
               <Link href="/products">Products</Link>
               <Link href="/about">About</Link>
               <Link href="/contact">Contact</Link>
+              <Link href="/account">Customer portal</Link>
             </nav>
 
-            <Link className="header-cta" href="/contact">
-              Become a customer
+            <Link className="header-cta" href="/account">
+              Customer portal
             </Link>
           </div>
         </header>
