@@ -16,7 +16,11 @@ export async function POST(
   }
 
   const { id } = await context.params;
-  const order = await getOrderForUser(session.user.id, id).catch(() => null);
+  const order = await getOrderForUser(
+    session.user.id,
+    id,
+    session.accessToken
+  ).catch(() => null);
 
   if (!order || order.status !== "submitted") {
     return NextResponse.json({ error: "Submitted order not found." }, { status: 404 });
@@ -25,7 +29,12 @@ export async function POST(
   try {
     let draft = null;
     for (const item of order.order_items || []) {
-      draft = await setDraftItem(session.user, item.product_id, item.quantity);
+      draft = await setDraftItem(
+        session.user,
+        session.accessToken,
+        item.product_id,
+        item.quantity
+      );
     }
     return NextResponse.json({ order: draft });
   } catch {
