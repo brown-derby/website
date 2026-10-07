@@ -14,7 +14,7 @@ const highlights = [
   {
     number: "03",
     title: "A better way to order",
-    text: "We are building this site into a full online catalog so customers can browse, reorder, and manage purchases more easily.",
+    text: "Customer accounts make it easier to build orders, reorder previous purchases, and manage online submissions.",
   },
 ];
 
@@ -27,8 +27,8 @@ export default function HomePage() {
             <p className="eyebrow">Grand Falls-Windsor · Newfoundland & Labrador</p>
             <h1>Wholesale, made easier.</h1>
             <p className="hero-lede">
-              Brown Derby Wholesale is building a better way for customers to discover
-              products, check what we carry, and eventually place orders online.
+              Browse Brown Derby products, check current catalog pricing, and sign in
+              to build and submit your wholesale order online.
             </p>
 
             <div className="hero-actions">
@@ -65,8 +65,8 @@ export default function HomePage() {
             <p className="eyebrow">What we&apos;re building</p>
             <h2>A customer website that becomes more useful over time.</h2>
             <p>
-              The first goal is a clear, branded catalog. From there, the site can
-              grow into customer accounts, pricing, saved orders, and online checkout.
+              Browse the catalog publicly, then sign in to add quantities, save a
+              current order, submit it to Brown Derby, and review past online orders.
             </p>
           </div>
 
