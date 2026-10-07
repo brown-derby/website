@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import products from "../../data/products.json";
+import {
+  catalogProducts,
+  getCatalogPrice,
+  type CatalogProduct,
+} from "../../lib/catalog";
 
-type Product = {
-  id: string;
-  name: string;
-  category: string;
-  websitePrice: number;
-};
+type Product = CatalogProduct;
 
 type PortalUser = {
   email: string;
@@ -25,7 +24,7 @@ type DraftOrder = {
   }>;
 };
 
-const allProducts = products as Product[];
+const allProducts = catalogProducts;
 
 const categoryDescriptions: Record<string, string> = {
   "Baking & Foodservice Ingredients":
@@ -102,7 +101,7 @@ function ProductTable({
               <td className="item-id">{product.id}</td>
               <td className="product-name-cell">{product.name}</td>
               {showCategory && <td>{product.category}</td>}
-              <td className="price-column">{money.format(product.websitePrice)}</td>
+              <td className="price-column">{money.format(getCatalogPrice(product))}</td>
               {orderEnabled && (
                 <td className="order-column">
                   <div className="catalog-quantity-control">
