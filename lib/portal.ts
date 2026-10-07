@@ -13,11 +13,7 @@ function required(name: string) {
 }
 
 export function portalConfigured() {
-  return Boolean(
-    process.env.SUPABASE_URL &&
-      process.env.SUPABASE_ANON_KEY &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY);
 }
 
 export function emailConfigured() {
@@ -48,15 +44,19 @@ export async function authRequest(path: string, init: RequestInit = {}) {
   });
 }
 
-export async function databaseRequest(path: string, init: RequestInit = {}) {
+export async function databaseRequest(
+  path: string,
+  accessToken: string,
+  init: RequestInit = {}
+) {
   const base = required("SUPABASE_URL").replace(/\/$/, "");
-  const service = required("SUPABASE_SERVICE_ROLE_KEY");
+  const anon = required("SUPABASE_ANON_KEY");
   return fetch(base + "/rest/v1/" + path, {
     ...init,
     cache: "no-store",
     headers: {
-      apikey: service,
-      Authorization: "Bearer " + service,
+      apikey: anon,
+      Authorization: "Bearer " + accessToken,
       "Content-Type": "application/json",
       ...(init.headers || {}),
     },
