@@ -66,7 +66,7 @@ export async function POST(
     const rows = (await response.json()) as CustomerOrder[];
 
     return NextResponse.json({ order: rows[0], emailedTo: "csr@brownderby.ca" });
-  } catch {
+  } catch (error) {
     await databaseRequest(
       "orders?id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(session.user.id),
       session.accessToken,
@@ -76,8 +76,18 @@ export async function POST(
       }
     ).catch(() => null);
 
+    const detail =
+      error instanceof Error && error.message.startsWith("Email delivery failed:")
+        ? error.message.replace("Email delivery failed:", "Resend rejected the email:")
+        : "";
+
     return NextResponse.json(
-      { error: "The order could not be emailed. Please try again before considering it submitted." },
+      {
+        error:
+          process.env.VERCEL_ENV === "preview" && detail
+            ? detail
+            : "The order could not be emailed. Please try again before considering it submitted.",
+      },
       { status: 502 }
     );
   }
