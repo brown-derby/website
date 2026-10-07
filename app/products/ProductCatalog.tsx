@@ -207,13 +207,13 @@ export default function ProductCatalog() {
                 onClick={() => openCategory(category)}
                 key={category}
               >
-                <div>
-                  <span className="category-count">{count.toLocaleString()} items</span>
+                <div className="category-card-content">
                   <h3>{category}</h3>
                   <p>
                     {categoryDescriptions[category] ??
                       "Browse products currently available in this category."}
                   </p>
+                  <span className="category-count">{count.toLocaleString()} items</span>
                 </div>
                 <span className="category-arrow" aria-hidden="true">→</span>
               </button>
