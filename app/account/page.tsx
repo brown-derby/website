@@ -1,4 +1,15 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "../../lib/seo";
 import PortalClient from "./PortalClient";
+
+export const metadata: Metadata = {
+  ...pageMetadata(
+    "Customer Portal",
+    "Manage your Brown Derby Wholesale order, update quantities, and review previously submitted orders in the customer portal.",
+    "/account",
+  ),
+  robots: { index: false, follow: true },
+};
 
 export default function AccountPage() {
   return (

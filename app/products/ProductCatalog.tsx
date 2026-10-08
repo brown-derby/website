@@ -143,9 +143,9 @@ function ProductTable({
   );
 }
 
-export default function ProductCatalog() {
+export default function ProductCatalog({ initialCategory = null }: { initialCategory?: string | null }) {
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
   const [user, setUser] = useState<PortalUser | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>({});

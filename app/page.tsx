@@ -1,10 +1,19 @@
 import Link from "next/link";
+import BusinessSchema from "./components/BusinessSchema";
+import CategoryLinks from "./components/CategoryLinks";
+import { pageMetadata } from "../lib/seo";
+
+export const metadata = pageMetadata(
+  "Newfoundland Wholesale Supplier",
+  "Brown Derby Wholesale supplies food, beverages, candy, packaging and janitorial products to Central Newfoundland businesses from Grand Falls-Windsor.",
+  "/"
+);
 
 const highlights = [
   {
     number: "01",
     title: "Wholesale supply",
-    text: "A practical source for businesses that need dependable access to the products they use and resell.",
+    text: "Food, grocery, beverages, candy, snacks, packaging and cleaning supplies for the products your business uses and resells.",
   },
   {
     number: "02",
@@ -21,14 +30,17 @@ const highlights = [
 export default function HomePage() {
   return (
     <>
+      <BusinessSchema />
       <section className="hero">
         <div className="shell hero-layout">
           <div className="hero-copy-block">
             <p className="eyebrow">Grand Falls-Windsor · Newfoundland & Labrador</p>
-            <h1>Wholesale, made easier.</h1>
+            <h1>Your wholesale supplier in Newfoundland.</h1>
             <p className="hero-lede">
-              Browse Brown Derby products, check current catalog pricing, and sign in
-              to build and submit your wholesale order online.
+              Brown Derby Wholesale supplies businesses throughout Central Newfoundland
+              from Grand Falls-Windsor. Browse food, beverages, candy and snacks,
+              janitorial supplies, disposables and restaurant smallwares, then sign in
+              to build your order online.
             </p>
 
             <div className="hero-actions">
@@ -62,8 +74,8 @@ export default function HomePage() {
       <section className="section">
         <div className="shell">
           <div className="section-heading">
-            <p className="eyebrow">What we&apos;re building</p>
-            <h2>A customer website that becomes more useful over time.</h2>
+            <p className="eyebrow">Wholesale, made easier</p>
+            <h2>Local supply for your everyday business needs.</h2>
             <p>
               Browse the catalog publicly, then sign in to add quantities, save a
               current order, submit it to Brown Derby, and review past online orders.
@@ -96,6 +108,21 @@ export default function HomePage() {
           <Link className="button button-light" href="/products">
             Open catalog
           </Link>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="shell">
+          <div className="section-heading">
+            <p className="eyebrow">Wholesale categories</p>
+            <h2>Supplies for your shelves, kitchen and workplace.</h2>
+            <p>
+              Explore our wholesale categories, compare product descriptions and
+              pack sizes, and contact our Grand Falls-Windsor team for help with
+              availability or becoming a customer.
+            </p>
+          </div>
+          <nav aria-label="Wholesale categories"><CategoryLinks /></nav>
         </div>
       </section>
 

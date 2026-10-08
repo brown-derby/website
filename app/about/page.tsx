@@ -1,3 +1,11 @@
+import { pageMetadata } from "../../lib/seo";
+
+export const metadata = pageMetadata(
+  "About Our Grand Falls-Windsor Wholesale Business",
+  "Learn about Brown Derby Wholesale, established in Grand Falls-Windsor in 1943 and supplying business customers throughout Central Newfoundland.",
+  "/about"
+);
+
 export default function AboutPage() {
   const stats = [
     { value: "1943", label: "Established" },

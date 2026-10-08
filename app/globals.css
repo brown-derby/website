@@ -139,6 +139,45 @@ h2 {
   line-height: 1.7;
 }
 
+.hero h1 {
+  font-size: clamp(3rem, 5.5vw, 5.7rem);
+  line-height: 1;
+}
+
+.category-landing-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 12px 24px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.category-landing-links a {
+  display: block;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--brown);
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+
+.category-landing-links a:hover {
+  color: var(--brown-dark);
+}
+
+.category-breadcrumb {
+  margin-bottom: 24px;
+  color: var(--ink-soft);
+  font-size: .9rem;
+  line-height: 1.7;
+}
+
+.category-page-hero h1 {
+  font-size: clamp(2.6rem, 5vw, 4.8rem);
+  line-height: 1.05;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
