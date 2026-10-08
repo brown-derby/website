@@ -146,8 +146,24 @@ try {
       assert.equal(logo.response.status, 200);
     }
 
+    if (path === "/about") {
+      assert.match(html, /Connors family/i);
+      assert.match(html, /1961/);
+      assert.match(html, /communitystories\\.ca\\/v2\\/main-street-merchants-windsor/);
+    }
+
     const category = categories.find(([slug]) => path === `/products/${slug}`);
     if (category) {
+      const breadcrumbScripts = [...html.matchAll(/<script\\b[^>]*type="application\\/ld\\+json"[^>]*>([\\s\\S]*?)<\\/script>/g)];
+      assert.equal(breadcrumbScripts.length, 1, `Expected one breadcrumb JSON-LD script on ${path}`);
+      const breadcrumb = JSON.parse(breadcrumbScripts[0][1]);
+      assert.equal(breadcrumb["@context"], "https://schema.org");
+      assert.equal(breadcrumb["@type"], "BreadcrumbList");
+      assert.deepEqual(breadcrumb.itemListElement, [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${origin}/` },
+        { "@type": "ListItem", position: 2, name: "Products", item: `${origin}/products` },
+        { "@type": "ListItem", position: 3, name: category[1], item: `${origin}${path}` },
+      ]);
       const tbody = html.match(/<tbody>([\s\S]*?)<\/tbody>/)?.[1];
       assert.ok(tbody, `Category products must be in initial server HTML: ${path}`);
       const expected = products.filter((product) => product.category === category[1]);
@@ -176,7 +192,7 @@ try {
   const resetPage = await get("/reset-password?code=test-placeholder");
   assert.equal(canonical(resetPage.html), `${origin}/reset-password`);
   assert.match(meta(resetPage.html, "robots"), /noindex/);
-  console.log(`SEO checks passed: ${publicPaths.length} public URLs, 8 category tables, sitemap, robots, business schema, private noindex and 404 handling.`);
+  console.log(`SEO checks passed: ${publicPaths.length} public URLs, 8 category tables with breadcrumb schema, heritage history, sitemap, robots, business schema, private noindex and 404 handling.`);
 } catch (error) {
   console.error(log);
   throw error;
