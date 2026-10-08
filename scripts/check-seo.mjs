@@ -149,12 +149,12 @@ try {
     if (path === "/about") {
       assert.match(html, /Connors family/i);
       assert.match(html, /1961/);
-      assert.match(html, /communitystories\\.ca\\/v2\\/main-street-merchants-windsor/);
+      assert.ok(html.includes("communitystories.ca/v2/main-street-merchants-windsor"));
     }
 
     const category = categories.find(([slug]) => path === `/products/${slug}`);
     if (category) {
-      const breadcrumbScripts = [...html.matchAll(/<script\\b[^>]*type="application\\/ld\\+json"[^>]*>([\\s\\S]*?)<\\/script>/g)];
+      const breadcrumbScripts = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
       assert.equal(breadcrumbScripts.length, 1, `Expected one breadcrumb JSON-LD script on ${path}`);
       const breadcrumb = JSON.parse(breadcrumbScripts[0][1]);
       assert.equal(breadcrumb["@context"], "https://schema.org");
