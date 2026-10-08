@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SITE_NAME, SITE_URL } from "../lib/seo";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
   title: {
-    default: "Brown Derby Wholesale",
-    template: "%s | Brown Derby Wholesale",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Brown Derby Wholesale — serving Central Newfoundland from Grand Falls-Windsor since 1943.",
+    "Wholesale products and dependable service from Brown Derby Wholesale in Grand Falls-Windsor, Newfoundland and Labrador.",
 };
 
 export default function RootLayout({

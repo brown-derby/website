@@ -29,6 +29,9 @@ npm run dev
 ```bash
 npm run check
 npm run build
+npm run check:seo
 ```
 
-Production is deployed from `main` through Vercel. Feature work should be reviewed on branches before promotion.
+The SEO check uses the production build and starts and stops its own local server. See [SEO.md](SEO.md) for the sitemap allowlist, metadata and schema conventions, dependency audit follow-up, and owner-managed Google tasks.
+
+Production is deployed automatically from `main` through Vercel. Review feature work in a pull request before merging to `main`, then verify the live deployment.

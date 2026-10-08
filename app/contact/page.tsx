@@ -1,6 +1,16 @@
+import BusinessSchema from "../components/BusinessSchema";
+import { pageMetadata } from "../../lib/seo";
+
+export const metadata = pageMetadata(
+  "Contact Brown Derby in Grand Falls-Windsor",
+  "Contact Brown Derby Wholesale at 22 Hardy Avenue, Grand Falls-Windsor, NL A2A 2P9. Call 709-489-2299 for products, availability and wholesale ordering.",
+  "/contact"
+);
+
 export default function ContactPage() {
   return (
     <>
+      <BusinessSchema />
       <section className="page-hero">
         <div className="shell">
           <p className="eyebrow">Contact</p>
