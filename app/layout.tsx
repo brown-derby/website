@@ -57,7 +57,7 @@ export default function RootLayout({
                   className="footer-logo"
                 />
               </Link>
-              <p className="footer-tagline">Serving Central Newfoundland since 1943.</p>
+              <p className="footer-tagline">Brown Derby roots dating to 1943. Wholesale since 1961.</p>
               <p>
                 Wholesale products and dependable service from Grand Falls-Windsor,
                 Newfoundland and Labrador.

@@ -67,7 +67,7 @@ export default function HomePage() {
         <div className="shell trust-grid">
           <span>Brown Derby Wholesale Ltd.</span>
           <span>Serving business customers from Central Newfoundland</span>
-          <span>Serving Central Newfoundland since 1943</span>
+          <span>Connors family roots in Grand Falls-Windsor since 1905</span>
         </div>
       </section>
 
@@ -133,8 +133,9 @@ export default function HomePage() {
             <p className="eyebrow">Our roots</p>
             <h2>Born from supplying local businesses.</h2>
             <p>
-              Brown Derby Wholesale was established in Grand Falls-Windsor in 1943 and has spent
-              more than 80 years supplying businesses throughout Central Newfoundland.
+              The Brown Derby story began with a Windsor Main Street restaurant in the
+              1940s. The Connors family moved into wholesale in 1961, helping supply
+              neighbouring shops in Central Newfoundland.
             </p>
             <Link className="text-link" href="/about">
               Read our story →

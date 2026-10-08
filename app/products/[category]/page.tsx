@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getCategoryLandingPage } from "../../../lib/categories";
 import { pageMetadata } from "../../../lib/seo";
 import CategoryLinks from "../../components/CategoryLinks";
+import BreadcrumbSchema from "../../components/BreadcrumbSchema";
 import ProductCatalog from "../ProductCatalog";
 
 // The catalog applies dated Program pricing. Render prices at request time,
@@ -25,6 +26,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <>
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Products", path: "/products" },
+          { name: category.category, path: `/products/${category.slug}` },
+        ]}
+      />
       <section className="page-hero category-page-hero">
         <div className="shell">
           <nav aria-label="Breadcrumb" className="category-breadcrumb">
