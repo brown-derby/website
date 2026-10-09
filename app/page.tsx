@@ -104,7 +104,7 @@ export default function HomePage() {
             <h2>See what Brown Derby carries.</h2>
             <p>
               Browse Brown Derby&apos;s current published catalog by category, search
-              by product name or item number, and see pricing for more than 2,500
+              by product name or item number, and sign in to see wholesale prices for more than 2,500
               products.
             </p>
           </div>
