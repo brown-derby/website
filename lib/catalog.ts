@@ -15,6 +15,13 @@ type ProgramPrice = {
 
 export const catalogProducts = products as CatalogProduct[];
 
+// Public pages receive only product details; prices remain on the server.
+export type PublicCatalogProduct = Pick<CatalogProduct, "id" | "name" | "category">;
+
+export function getPublicCatalogProducts(): PublicCatalogProduct[] {
+  return catalogProducts.map(({ id, name, category }) => ({ id, name, category }));
+}
+
 const byId = new Map(catalogProducts.map((product) => [product.id, product]));
 const programById = programPrices as Record<string, ProgramPrice>;
 
