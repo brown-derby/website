@@ -152,6 +152,12 @@ try {
       assert.ok(html.includes("communitystories.ca/v2/main-street-merchants-windsor"));
     }
 
+    if (path === "/products" || path.startsWith("/products/")) {
+      // Public HTML and serialized React props must not contain wholesale prices.
+      assert.doesNotMatch(html, /websitePrice|programPrices|unit_price/, path);
+      assert.doesNotMatch(html, /<t[dh][^>]*class="price-column"/, path);
+    }
+
     const category = categories.find(([slug]) => path === `/products/${slug}`);
     if (category) {
       const breadcrumbScripts = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
@@ -171,6 +177,12 @@ try {
       assert.match(tbody, new RegExp(expected[0].id));
     }
   }
+
+  // The prices endpoint must reject requests without a verified customer session.
+  const privatePricing = await get("/api/catalog/prices");
+  assert.equal(privatePricing.response.status, 401);
+  assert.match(privatePricing.response.headers.get("cache-control") || "", /no-store/);
+  assert.doesNotMatch(privatePricing.html, /"prices"\s*:/);
 
   for (const path of ["/account", "/login", "/reset-password"]) {
     const { response, html } = await get(path);

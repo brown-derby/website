@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import {
-  catalogProducts,
-  getCatalogPrice,
-  type CatalogProduct,
-} from "../../lib/catalog";
-
-type Product = CatalogProduct;
+type Product = { id: string; name: string; category: string };
 
 type PortalUser = {
   email: string;
@@ -23,8 +17,6 @@ type DraftOrder = {
     quantity: number;
   }>;
 };
-
-const allProducts = catalogProducts;
 
 const categoryDescriptions: Record<string, string> = {
   "Baking & Foodservice Ingredients":
@@ -70,6 +62,8 @@ function ProductTable({
   items,
   showCategory = false,
   orderEnabled,
+  showPrices,
+  prices,
   quantities,
   savingProduct,
   onQuantityChange,
@@ -78,6 +72,8 @@ function ProductTable({
   items: Product[];
   showCategory?: boolean;
   orderEnabled: boolean;
+  showPrices: boolean;
+  prices: Record<string, number> | null;
   quantities: Record<string, number>;
   savingProduct: string;
   onQuantityChange: (productId: string, quantity: number) => void;
@@ -91,7 +87,7 @@ function ProductTable({
             <th>Item #</th>
             <th>Product</th>
             {showCategory && <th>Category</th>}
-            <th className="price-column">Price</th>
+            {showPrices && <th className="price-column">Price</th>}
             {orderEnabled && <th className="order-column">Order qty</th>}
           </tr>
         </thead>
@@ -101,7 +97,13 @@ function ProductTable({
               <td className="item-id">{product.id}</td>
               <td className="product-name-cell">{product.name}</td>
               {showCategory && <td>{product.category}</td>}
-              <td className="price-column">{money.format(getCatalogPrice(product))}</td>
+              {showPrices && (
+                <td className="price-column">
+                  {prices?.[product.id] !== undefined
+                    ? money.format(prices[product.id])
+                    : prices ? "—" : "Loading…"}
+                </td>
+              )}
               {orderEnabled && (
                 <td className="order-column">
                   <div className="catalog-quantity-control">
@@ -143,10 +145,18 @@ function ProductTable({
   );
 }
 
-export default function ProductCatalog({ initialCategory = null }: { initialCategory?: string | null }) {
+export default function ProductCatalog({
+  initialCategory = null,
+  products,
+}: {
+  initialCategory?: string | null;
+  products: Product[];
+}) {
+  const allProducts = products;
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
   const [user, setUser] = useState<PortalUser | null>(null);
+  const [prices, setPrices] = useState<Record<string, number> | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [savingProduct, setSavingProduct] = useState("");
@@ -159,7 +169,7 @@ export default function ProductCatalog({ initialCategory = null }: { initialCate
       counts.set(product.category, (counts.get(product.category) ?? 0) + 1);
     }
     return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  }, []);
+  }, [allProducts]);
 
   const searchResults = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -172,14 +182,14 @@ export default function ProductCatalog({ initialCategory = null }: { initialCate
           product.id.toLowerCase().includes(needle)
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [query]);
+  }, [query, allProducts]);
 
   const categoryProducts = useMemo(() => {
     if (!selectedCategory) return [];
     return allProducts
       .filter((product) => product.category === selectedCategory)
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [selectedCategory]);
+  }, [selectedCategory, allProducts]);
 
   const hasSearch = query.trim().length > 0;
   const orderLineCount = Object.values(quantities).filter((quantity) => quantity > 0).length;
@@ -205,7 +215,20 @@ export default function ProductCatalog({ initialCategory = null }: { initialCate
 
         const sessionData = await sessionResponse.json();
         if (cancelled) return;
+        if (!sessionData.authenticated || !sessionData.user) return;
         setUser(sessionData.user);
+
+        const priceResponse = await fetch("/api/catalog/prices", { cache: "no-store" });
+        if (priceResponse.status === 401) {
+          if (!cancelled) setUser(null);
+          return;
+        }
+        if (priceResponse.ok) {
+          const priceData = await priceResponse.json();
+          if (!cancelled && priceData.prices && typeof priceData.prices === "object") {
+            setPrices(priceData.prices);
+          }
+        }
 
         const draftResponse = await fetch("/api/orders/draft", { cache: "no-store" });
         if (draftResponse.ok) {
@@ -264,6 +287,8 @@ export default function ProductCatalog({ initialCategory = null }: { initialCate
 
   const tableProps = {
     orderEnabled: Boolean(user),
+    showPrices: Boolean(user),
+    prices,
     quantities,
     savingProduct,
     onQuantityChange: (productId: string, quantity: number) =>
@@ -300,8 +325,8 @@ export default function ProductCatalog({ initialCategory = null }: { initialCate
               <div>
                 <strong>Ordering as {user.businessName || user.email}</strong>
                 <span>
-                  Enter a quantity beside any product and press Save. Use 0 to remove
-                  an item.
+                  View wholesale prices, enter a quantity beside any product and press Save.
+                  Use 0 to remove an item.
                 </span>
               </div>
               <Link href="/account">
@@ -311,8 +336,8 @@ export default function ProductCatalog({ initialCategory = null }: { initialCate
           ) : (
             <>
               <div>
-                <strong>Want to place an order?</strong>
-                <span>Sign in to add quantities directly from the catalog.</span>
+                <strong>Sign in to see wholesale pricing</strong>
+                <span>Customer pricing and online ordering are available after sign-in.</span>
               </div>
               <Link href="/login">Customer sign in →</Link>
             </>

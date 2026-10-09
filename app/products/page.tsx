@@ -1,6 +1,7 @@
 import ProductCatalog from "./ProductCatalog";
 import CategoryLinks from "../components/CategoryLinks";
 import { pageMetadata } from "../../lib/seo";
+import { getPublicCatalogProducts } from "../../lib/catalog";
 
 export const metadata = pageMetadata(
   "Wholesale Products in Newfoundland",
@@ -19,7 +20,7 @@ export default function ProductsPage() {
             Search by product name or item number, or browse our catalog by category.
             Brown Derby supplies wholesale food, beverages, confectionery, packaging,
             cleaning products and restaurant supplies from Grand Falls-Windsor,
-            Newfoundland. Select a category to see its full price list.
+            Newfoundland. Sign in to see wholesale pricing and place an order.
           </p>
           <nav aria-label="Wholesale category guides">
             <CategoryLinks />
@@ -29,7 +30,7 @@ export default function ProductsPage() {
 
       <section className="catalog-shell">
         <div className="shell">
-          <ProductCatalog />
+          <ProductCatalog products={getPublicCatalogProducts()} />
         </div>
       </section>
     </>
