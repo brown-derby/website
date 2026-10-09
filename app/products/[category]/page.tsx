@@ -5,9 +5,9 @@ import { pageMetadata } from "../../../lib/seo";
 import CategoryLinks from "../../components/CategoryLinks";
 import BreadcrumbSchema from "../../components/BreadcrumbSchema";
 import ProductCatalog from "../ProductCatalog";
+import { getPublicCatalogProducts } from "../../../lib/catalog";
 
-// The catalog applies dated Program pricing. Render prices at request time,
-// rather than freezing them into category HTML at deployment time.
+// Render category pages at request time, without including private prices in public HTML.
 export const dynamic = "force-dynamic";
 
 type CategoryPageProps = { params: Promise<{ category: string }> };
@@ -50,7 +50,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       <section className="catalog-shell">
         <div className="shell">
-          <ProductCatalog key={category.slug} initialCategory={category.category} />
+          <ProductCatalog key={category.slug} initialCategory={category.category} products={getPublicCatalogProducts()} />
         </div>
       </section>
 
