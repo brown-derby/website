@@ -55,8 +55,11 @@ export default function HomePage() {
 
           <div className="hero-logo-panel">
             <img
-              src="/brown-derby-logo.svg"
-              alt="Brown Derby Wholesale"
+              src="/brown-derby-hero.webp"
+              alt="Brown Derby Wholesale emblem"
+              width={680}
+              height={680}
+              fetchPriority="high"
               className="hero-logo"
             />
           </div>

@@ -218,33 +218,17 @@ h2 {
 
 .hero-logo-panel {
   position: relative;
-  min-height: 410px;
   display: grid;
   place-items: center;
-  padding: 46px;
-  border: 1px solid rgba(106,58,33,.16);
+  overflow: hidden;
   border-radius: 36px;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(196,147,79,.18), transparent 58%),
-    var(--cream);
   box-shadow: 0 30px 80px rgba(68,36,20,.11);
 }
 
-.hero-logo-panel::before {
-  content: "";
-  position: absolute;
-  inset: 18px;
-  border: 1px solid rgba(106,58,33,.10);
-  border-radius: 28px;
-}
-
 .hero-logo {
-  position: relative;
-  z-index: 1;
   display: block;
-  width: min(100%, 410px);
+  width: 100%;
   height: auto;
-  filter: drop-shadow(0 18px 22px rgba(68,36,20,.14));
 }
 
 .trust-strip {
@@ -711,7 +695,7 @@ h2 {
     grid-template-columns: 1fr;
     gap: 45px;
   }
-  .hero-logo-panel { min-height: 340px; }
+  .hero-logo-panel { min-height: 0; }
   .feature-grid,
   .catalog-grid,
   .footer-grid {
@@ -762,15 +746,7 @@ h2 {
   .section { padding: 72px 0; }
   .site-logo { height: 56px; }
   .footer-logo { height: 72px; }
-  .hero-logo-panel {
-    min-height: 280px;
-    padding: 30px;
-    border-radius: 26px;
-  }
-  .hero-logo-panel::before {
-    inset: 12px;
-    border-radius: 20px;
-  }
+  .hero-logo-panel { border-radius: 26px; }
   .heritage-date { font-size: 7rem; }
 
   .footer-grid {
