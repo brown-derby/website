@@ -1,0 +1,656 @@
+[
+  {
+    "id": "batch-400-20261013",
+    "name": "400-item batch \u00b7 October 13",
+    "target": 400,
+    "created_at": "2026-10-13",
+    "product_ids": [
+      "5565343470",
+      "5565343480",
+      "5565343490",
+      "5565347790",
+      "4111611801",
+      "6063192940",
+      "6063192979",
+      "6063192994",
+      "6063191727",
+      "5565343570",
+      "7104759996",
+      "7104759997",
+      "7104759777",
+      "7104759500",
+      "6625944360",
+      "5770001925",
+      "7097049249",
+      "5980075300",
+      "5980075066",
+      "6120022838",
+      "6120001189",
+      "6120022802",
+      "6063193379",
+      "6257245117",
+      "6063192802",
+      "5269700860",
+      "7225005810",
+      "6063192580",
+      "6063192653",
+      "6063192579",
+      "6063192582",
+      "8903632266",
+      "8903620131",
+      "8903632149",
+      "8903630139",
+      "8903632245",
+      "6120002019",
+      "7104759779",
+      "7298410004",
+      "5003711",
+      "5660061104",
+      "7104712807",
+      "7104713004",
+      "7104701050",
+      "7104702138",
+      "7104701119",
+      "7104701111",
+      "7104701142",
+      "7104702115",
+      "7104702125",
+      "7104702289",
+      "7104702548",
+      "7104702296",
+      "7104701118",
+      "7104713200",
+      "7104702136",
+      "7104702301",
+      "7104701055",
+      "7104701014",
+      "7104701016",
+      "7104702120",
+      "7104702550",
+      "7104701025",
+      "7104713005",
+      "7104702549",
+      "7104713659",
+      "5565610615",
+      "2819240399",
+      "2819240337",
+      "2819240355",
+      "2819240404",
+      "2819240302",
+      "6410014796",
+      "6410014620",
+      "8903631283",
+      "6063119003",
+      "7298410006",
+      "8903636011",
+      "8903621285",
+      "8903659301",
+      "8903631133",
+      "8903620281",
+      "7097049248",
+      "8903631105",
+      "8903631191",
+      "8903620205",
+      "8903631266",
+      "6285132088",
+      "7097049246",
+      "5770001789",
+      "4289796032",
+      "7920037008",
+      "1380500025",
+      "1380500024",
+      "7939713683",
+      "7104702582",
+      "7104701184",
+      "7104799361",
+      "7104702290",
+      "7104799373",
+      "7104799368",
+      "7104702300",
+      "7104701035",
+      "7104759501",
+      "6202005063",
+      "5849684070",
+      "5770001727",
+      "5770001512",
+      "5770001726",
+      "6753542011",
+      "7097049247",
+      "6257238367",
+      "5980020172",
+      "5980074527",
+      "6120022603",
+      "6120001864",
+      "4111607362",
+      "4111605360",
+      "5849646899",
+      "7920013646",
+      "6063192043",
+      "5660042530",
+      "2819240348",
+      "2819240307",
+      "2819240362",
+      "6410011135",
+      "5785803018",
+      "7339001559",
+      "7339000959",
+      "7339000112",
+      "4111600477",
+      "5849646750",
+      "6063193740",
+      "6285136540",
+      "6285136530",
+      "7920024360",
+      "5660040613",
+      "5660077013",
+      "5660049321",
+      "5660049329",
+      "4111603281",
+      "4111601870",
+      "4111605911",
+      "4111600626",
+      "7939745340",
+      "7344231747",
+      "5849644659",
+      "5770021588",
+      "5770021508",
+      "7920017654",
+      "5980074589",
+      "5980015807",
+      "5980090009",
+      "5980020021",
+      "5980013182",
+      "5980021859",
+      "5980074761",
+      "5980075308",
+      "5980074763",
+      "5980020081",
+      "5980084857",
+      "5980075277",
+      "6120024395",
+      "6120001444",
+      "6120015460",
+      "6120001894",
+      "666593",
+      "7939730250",
+      "5849689991",
+      "5849642240",
+      "5849655277",
+      "8903631142",
+      "8903631286",
+      "8903631257",
+      "8903631290",
+      "8903631146",
+      "8903631135",
+      "8903631260",
+      "8903620265",
+      "8903631155",
+      "8903631197",
+      "8903631145",
+      "8903631193",
+      "8903620215",
+      "8903620220",
+      "4735111200",
+      "8941",
+      "6063190303",
+      "6063117993",
+      "8903631268",
+      "7097049245",
+      "6175205207",
+      "7209200262",
+      "7209200292",
+      "7209200382",
+      "7209247072",
+      "7418230105",
+      "6468400632",
+      "4156534070",
+      "4111610636",
+      "6257220174",
+      "5430000114",
+      "7104713001",
+      "7104767533",
+      "5849688013",
+      "5770021600",
+      "6257249681",
+      "6257296831",
+      "6257249683",
+      "6257249680",
+      "6257296801",
+      "7339061537",
+      "7920018508",
+      "6120001339",
+      "6257213605",
+      "5849683962",
+      "5849646079",
+      "5849689094",
+      "6285133999",
+      "4111610492",
+      "5833634012",
+      "5833634014",
+      "6260700103",
+      "6280242023",
+      "6280242283",
+      "6280254281",
+      "6280242093",
+      "6360000451",
+      "6360000414",
+      "6360002469",
+      "6756811080",
+      "7920008451",
+      "5980075054",
+      "6625944419",
+      "2819240375",
+      "7339000113",
+      "7339001645",
+      "7920018125",
+      "6257245115",
+      "4289795927",
+      "4111610581",
+      "5964290745",
+      "5964234101",
+      "1380500061",
+      "7939746875",
+      "6063192087",
+      "6063111224",
+      "6800040113",
+      "6202022702",
+      "6202002701",
+      "6202012716",
+      "5565600402",
+      "55656004179",
+      "5565600400",
+      "6120001698",
+      "6120021233",
+      "5849683963",
+      "6063118603",
+      "6257220232",
+      "109750700",
+      "6410011138",
+      "6410011869",
+      "6063193970",
+      "7939713653",
+      "5770001798",
+      "5565610108",
+      "6063191100",
+      "6284753052",
+      "7339000117",
+      "7939745327",
+      "7339000115",
+      "6285152882",
+      "8903631125",
+      "6063192912",
+      "6845890099",
+      "7339005168",
+      "5770022994",
+      "6202003168",
+      "7939747743",
+      "9048400001",
+      "8085400005",
+      "8085400035",
+      "6360002042",
+      "7618300443",
+      "7618300445",
+      "6753530196",
+      "6490016010",
+      "6800040902",
+      "2907100043",
+      "7618300435",
+      "6284763062",
+      "7618300441",
+      "6490016009",
+      "5849647205",
+      "7279901884",
+      "7939720142",
+      "2907100157",
+      "9879400042",
+      "9879400046",
+      "6284763260",
+      "6285152501",
+      "6285132002",
+      "6063193716",
+      "6063193751",
+      "6063193718",
+      "6257245114",
+      "8903621001",
+      "7339061345",
+      "5003459712",
+      "7097047336",
+      "5660040030",
+      "6410085305",
+      "6285136405",
+      "6202003174",
+      "6454131367",
+      "2862213554",
+      "6817411150",
+      "6753513650",
+      "5660046039",
+      "7939747169",
+      "6285136400",
+      "5660042502",
+      "5980040076",
+      "5980049089",
+      "6500035002",
+      "5660090384",
+      "0046301182",
+      "1792915909",
+      "5849642130",
+      "6360000408",
+      "6753530400",
+      "4111610544",
+      "5770062862",
+      "2907100031",
+      "6175205525",
+      "5577382309",
+      "6175202081",
+      "6175202084",
+      "6401312043",
+      "6490020012",
+      "644",
+      "5849642128",
+      "6800049283",
+      "9492268841",
+      "5849646492",
+      "6063118033",
+      "2311422322",
+      "2311422308",
+      "7339001154",
+      "6063193714",
+      "5770085387",
+      "6285153837",
+      "6120001843",
+      "5565610610",
+      "6810004195",
+      "6810004239",
+      "6810004235",
+      "6810004577",
+      "5889150261",
+      "5850418303",
+      "5850418304",
+      "5660049324",
+      "6401300018",
+      "7104702502",
+      "6120001848",
+      "7104702500",
+      "7939746835",
+      "6410011136",
+      "4289795919",
+      "2022121690",
+      "7104767527",
+      "9048400025",
+      "8085400082",
+      "8085400054",
+      "5849646896",
+      "5520017725",
+      "21046",
+      "6477721006",
+      "2907100153",
+      "6360002776",
+      "21001",
+      "8903632165",
+      "5770001803",
+      "8903632255",
+      "6810004259",
+      "6810004236",
+      "5833634018",
+      "6410085263",
+      "6410085284",
+      "6410011133",
+      "5660049370",
+      "5565319180",
+      "5964292731",
+      "5964234100",
+      "6625944422",
+      "5980075211",
+      "6175202086",
+      "8903632147",
+      "6285152333",
+      "6410011934"
+    ],
+    "research_notes": [
+      {
+        "product_id": "6120001843",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "5565610610",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "6810004195",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6810004239",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6810004235",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6810004577",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5889150261",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5850418303",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5850418304",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5660049324",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "6401300018",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "7104702502",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "6120001848",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "7104702500",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "7939746835",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "6410011136",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "4289795919",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "2022121690",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "7104767527",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "9048400025",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "8085400082",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "8085400054",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5849646896",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "5520017725",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "21046",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6477721006",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "2907100153",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6360002776",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "21001",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "8903632165",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "5770001803",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "8903632255",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "6810004259",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6810004236",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5833634018",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6410085263",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6410085284",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6410011133",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5660049370",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "5565319180",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5964292731",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "5964234100",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "6625944422",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5980075211",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6175202086",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "8903632147",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "6285152333",
+        "note": "Source lead differs in flavour, product format, or packaging; withheld for further research."
+      },
+      {
+        "product_id": "6410011934",
+        "note": "No source variant with a compatible size/pack and product identity was established; image withheld."
+      },
+      {
+        "product_id": "5770001789",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5849684070",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "7104767533",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5849688013",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5849646079",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5849683962",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5849689094",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5964290745",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5964234101",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "6202022702",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "6120021233",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5849642130",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      },
+      {
+        "product_id": "5849642128",
+        "note": "Further source verification found a different product form, flavour, unit size, or explicit package count. This photo is withheld; further research is needed."
+      }
+    ]
+  }
+]

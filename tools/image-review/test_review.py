@@ -2,6 +2,7 @@ import base64
 import json
 import tempfile
 import unittest
+from unittest.mock import patch, MagicMock
 from pathlib import Path
 from review import Queue, FIELDS
 
@@ -148,6 +149,37 @@ class ReviewTests(unittest.TestCase):
             for sql in ("UPDATE candidates SET payload='{}'", "UPDATE events SET action='approve'", 'DELETE FROM events'):
                 with self.assertRaises(Exception):
                     db.execute(sql)
+
+    def test_research_withdrawal_never_revokes_human_approval(self):
+        self.queue.withdraw(self.cid, 'Source variant has a different format.')
+        self.assertEqual(self.queue.snapshot()['candidates'], [])
+        self.assertEqual(self.queue.approved(), {})
+        self.assertEqual(self.queue.snapshot()['events'][-1]['action'], 'research_withheld')
+        replacement = self.queue.add('000123', self.evidence, PNG)
+        self.queue.decide({**self.body, 'candidate_id': replacement})
+        with self.assertRaises(ValueError):
+            self.queue.withdraw(replacement, 'Research cannot revoke this approval')
+        self.assertEqual(self.queue.approved()['000123']['candidateId'], replacement)
+
+    def test_publication_verification_preserves_exact_identity_and_uses_cache(self):
+        product = {'id': '000123', 'name': self.inventory[0]['name'], 'imageUrl': '/product-images/' + 'a'*64 + '.png', 'category': 'Test'}
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.url = 'https://brownderby.ca/api/catalog/images'
+        response.read.return_value = json.dumps({'application': 'brown-derby-published-images', 'products': [product]}).encode()
+        with patch('review.urlopen', return_value=response) as fetch:
+            verified = self.queue.published()
+            self.assertEqual(verified['products'][0]['id'], '000123')
+            self.assertEqual(set(verified['products'][0]), {'id', 'name', 'imageUrl'})
+            self.assertEqual(self.queue.published(), verified)
+            self.assertEqual(fetch.call_count, 1)
+
+    def test_missing_publication_endpoint_does_not_claim_images_are_live(self):
+        with patch('review.urlopen', side_effect=OSError('Endpoint not available')):
+            result = self.queue.published()
+            self.assertIsNone(result['products'])
+            self.assertIn('error', result)
+            self.assertEqual(self.queue.approved(), {})
 
 
 if __name__ == '__main__':

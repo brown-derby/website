@@ -20,6 +20,7 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parent
+SITE_ORIGIN = "https://brownderby.ca"
 FIELDS = ("sku", "brand", "product_name", "flavor", "size", "format", "case_pack")
 
 
@@ -222,7 +223,7 @@ class Queue:
         with self.connect() as db:
             products = [dict(r) for r in db.execute("SELECT * FROM products WHERE active=1 ORDER BY category,name,id")]
             candidates = []
-            for row in db.execute("SELECT * FROM candidates ORDER BY created_at,id"):
+            for row in db.execute("SELECT * FROM candidates WHERE status!='withdrawn' ORDER BY created_at,id"):
                 candidate = dict(row)
                 candidate["evidence"] = json.loads(candidate.pop("payload"))
                 candidates.append(candidate)
@@ -230,6 +231,24 @@ class Queue:
             for event in events:
                 event["payload"] = json.loads(event["payload"])
         return {"products": products, "candidates": candidates, "events": events}
+
+    def withdraw(self, cid, note):
+        """Withhold a research proposal when source verification finds a conflict.
+
+        Never revoke a human approval or fabricate a human rejection.
+        """
+        if not str(note).strip():
+            raise ValueError("A factual research withdrawal reason is required.")
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            candidate = db.execute("SELECT * FROM candidates WHERE id=?", (cid,)).fetchone()
+            if not candidate or candidate["status"] != "pending":
+                raise ValueError("Only undecided research proposals can be withdrawn.")
+            product = db.execute("SELECT * FROM products WHERE id=?", (candidate["product_id"],)).fetchone()
+            if product["approved_candidate"] == cid:
+                raise ValueError("Approved content cannot be withdrawn by research.")
+            db.execute("UPDATE candidates SET status='withdrawn' WHERE id=?", (cid,))
+            self.event(db, candidate["product_id"], cid, "research_withheld", {"note": note})
 
     def approved(self):
         entries = {}
@@ -260,6 +279,33 @@ class Queue:
                     "previousApproved": decision.get("previous_approved"),
                 }
         return entries
+
+    def published(self):
+        """Read the same price-free approved products rendered by the live site."""
+        cache = self.folder / "published.json"
+        previous = json.loads(cache.read_text(encoding="utf-8")) if cache.exists() else None
+        if previous and (datetime.now(timezone.utc) - datetime.fromisoformat(previous["verified_at"])).total_seconds() < 30:
+            return previous
+        try:
+            request = Request(SITE_ORIGIN + "/api/catalog/images", headers={"User-Agent": "BrownDerbyImageReview/1.0"})
+            with urlopen(request, timeout=5) as response:
+                if urlparse(response.url).hostname not in ("brownderby.ca", "www.brownderby.ca"):
+                    raise ValueError("Website verification redirected to an unexpected host.")
+                data = json.loads(response.read(2 * 1024 * 1024))
+            if data.get("application") != "brown-derby-published-images" or not isinstance(data.get("products"), list):
+                raise ValueError("The live website does not yet expose image publication status.")
+            products = []
+            for product in data["products"]:
+                if not all(isinstance(product.get(k), str) for k in ("id", "name", "imageUrl")) or not re.fullmatch(r"/product-images/[0-9a-f]{64}\.(jpg|png|webp)", product["imageUrl"]):
+                    raise ValueError("Invalid published image identity.")
+                products.append({k: product[k] for k in ("id", "name", "imageUrl")})
+            result = {"site_url": SITE_ORIGIN, "verified_at": now(), "products": products}
+            temporary = cache.with_suffix(".tmp")
+            temporary.write_text(json.dumps(result), encoding="utf-8")
+            temporary.replace(cache)
+            return result
+        except (OSError, ValueError) as error:
+            return {**(previous or {"site_url": SITE_ORIGIN, "products": None}), "error": "Unable to check live publication: " + str(error)}
 
     def master_csv(self):
         approved = self.approved()
@@ -349,7 +395,11 @@ def serve(queue, port):
             path = urlparse(self.path).path
             try:
                 if path == "/api/queue":
-                    return self.send({**queue.snapshot(), "token": token, "application": "brown-derby-image-review"})
+                    batches_file = ROOT / "batches.json"
+                    batches = json.loads(batches_file.read_text(encoding="utf-8")) if batches_file.exists() else []
+                    return self.send({**queue.snapshot(), "batches": batches, "token": token, "application": "brown-derby-image-review"})
+                if path == "/api/publishing":
+                    return self.send(queue.published())
                 if path == "/api/export/approved":
                     return self.send(queue.approved(), filename="approved-product-images.json")
                 if path == "/api/export/master":

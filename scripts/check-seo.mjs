@@ -184,6 +184,21 @@ try {
   assert.match(privatePricing.response.headers.get("cache-control") || "", /no-store/);
   assert.doesNotMatch(privatePricing.html, /"prices"\s*:/);
 
+  // Publication verification must expose only the same public product details
+  // and image bindings used by the catalog, never prices or reviewer data.
+  const imageStatus = await get("/api/catalog/images");
+  assert.equal(imageStatus.response.status, 200);
+  assert.match(imageStatus.response.headers.get("cache-control"), /no-store/);
+  const publishedImages = JSON.parse(imageStatus.html);
+  assert.equal(publishedImages.application, "brown-derby-published-images");
+  const imageManifest = JSON.parse(await readFile(new URL("../data/approved-product-images.json", import.meta.url), "utf8"));
+  assert.equal(publishedImages.products.length, Object.keys(imageManifest).length);
+  for (const product of publishedImages.products) {
+    assert.deepEqual(Object.keys(product).sort(), ["category", "id", "imageUrl", "name"]);
+    assert.equal(product.name, imageManifest[product.id].productName);
+    assert.equal(product.imageUrl, imageManifest[product.id].imageUrl);
+  }
+
   for (const path of ["/account", "/login", "/reset-password"]) {
     const { response, html } = await get(path);
     assert.equal(response.status, 200, path);
