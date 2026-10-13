@@ -11,7 +11,7 @@ for (const [id, image] of Object.entries(approved)) {
   assert.equal(image.productId, id, `${id}: identity mismatch`);
   assert.equal(image.productName, master.get(id)?.name, `${id}: stale or incorrect product name`);
   assert.equal(image.matchConfirmed, true, `${id}: missing product verification`);
-  assert.equal(image.usageConfirmed, true, `${id}: missing image-use verification`);
+  assert.ok(image.usageConfirmed === true || (image.approvalMethod === 'one_click_add' && image.imageConfirmed === true), `${id}: missing explicit Add decision`);
   assert.ok(image.approvalId && image.approvedBy && image.approvedAt && image.candidateId, `${id}: missing approval audit`);
   assert.match(image.sha256, /^[0-9a-f]{64}$/);
   assert.match(image.imageUrl, new RegExp(`^/product-images/${image.sha256}\\.(jpg|png|webp)$`));

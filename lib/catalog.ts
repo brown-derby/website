@@ -30,6 +30,8 @@ type ApprovedImage = {
   approvalId: string;
   matchConfirmed: boolean;
   usageConfirmed: boolean;
+  approvalMethod?: string;
+  imageConfirmed?: boolean;
 };
 
 const imagesById = approvedImages as Record<string, ApprovedImage>;
@@ -40,7 +42,7 @@ export function getPublicCatalogProducts(): PublicCatalogProduct[] {
     // Exact ID AND name binding; candidate research never enters public props.
     const imageUrl = image?.status === "approved" && image.productId === id &&
       image.productName === name && image.matchConfirmed === true &&
-      image.usageConfirmed === true && Boolean(image.approvalId) &&
+      (image.usageConfirmed === true || (image.approvalMethod === "one_click_add" && image.imageConfirmed === true)) && Boolean(image.approvalId) &&
       /^[0-9a-f]{64}$/.test(image.sha256) &&
       new RegExp(`^/product-images/${image.sha256}\\.(jpg|png|webp)$`).test(image.imageUrl)
       ? image.imageUrl : undefined;

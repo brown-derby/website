@@ -45,6 +45,29 @@ class ReviewTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.queue.decide({**self.body, **change})
 
+    def test_one_click_add_is_explicit_and_does_not_invent_usage_permission(self):
+        body = {key: self.body[key] for key in ('action', 'product_id', 'candidate_id', 'revision', 'expected_approved')}
+        body['approval_method'] = 'one_click_add'
+        with self.assertRaises(ValueError):
+            self.queue.decide(body)
+        self.queue.decide({**body, 'image_confirmed': True, 'usage_confirmed': True})
+        entry = Queue(self.root / 'state').approved()['000123']
+        self.assertTrue(entry['imageConfirmed'])
+        self.assertFalse(entry['usageConfirmed'])
+        self.assertEqual(entry['approvalMethod'], 'one_click_add')
+        self.assertEqual(self.queue.snapshot()['candidates'][0]['evidence']['match']['sku']['status'], 'unknown')
+
+    def test_one_click_add_retains_revision_and_replacement_gates(self):
+        body = {**self.body, 'approval_method': 'one_click_add', 'image_confirmed': True}
+        with self.assertRaises(ValueError):
+            self.queue.decide({**body, 'revision': 2})
+        self.queue.decide(body)
+        replacement = self.queue.add('000123', {**self.evidence, 'source_note': 'New test proposal'}, PNG)
+        body = {**body, 'candidate_id': replacement, 'expected_approved': self.cid}
+        with self.assertRaises(ValueError):
+            self.queue.decide(body)
+        self.queue.decide({**body, 'replace_confirmed': True})
+
     def test_approval_persists_and_duplicate_decision_refused(self):
         self.queue.decide(self.body)
         reopened = Queue(self.root / 'state')

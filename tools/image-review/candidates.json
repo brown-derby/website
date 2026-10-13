@@ -198,5 +198,205 @@
         }
       }
     }
+  },
+  {
+    "product_id": "5565347790",
+    "candidate_id": "dare-5565347790-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/juicee-gumdrops-merry-mix/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2023/11/Dare_CandyCo-Juicee-Gumdrops_225g.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong brand, flavour and size evidence; confirm supplier SKU and current packaging",
+      "image_scope": "Single retail bag; case quantity is not pictured",
+      "usage_suitability": "Manufacturer-hosted product image. Website reuse permission is unconfirmed.",
+      "ambiguity": "The manufacturer UPC is recorded below. Brown Derby item IDs resemble UPCs with the first zero and final check digit removed, but this mapping has not been confirmed by the inventory source. Compare current packaging; case quantity has not been independently established.",
+      "supporting_sources": [
+        {
+          "label": "Manufacturer SmartLabel: size and UPC",
+          "url": "https://smartlabel.darefoods.com/055653477907-0001-en-CA/index.html"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Manufacturer UPC 055653477907; inventory item 5565347790. Confirm supplier barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Dare brand appears on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer identifies Dare Juicee Gumdrops Merry Mix."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Juicee Gumdrops Merry Mix appears on the manufacturer product page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "225 g shown by the manufacturer product page and package."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "One retail bag is pictured; confirm packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "unknown",
+          "detail": "No case quantity is present in the inventory name; not independently established."
+        }
+      }
+    }
+  },
+  {
+    "product_id": "5565343490",
+    "candidate_id": "dare-5565343490-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/realmallow-marshmallow-peach/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2022/03/Seasonal_Summer-Peach_150g.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong brand, flavour and size evidence; confirm supplier SKU and current packaging",
+      "image_scope": "Single retail bag; case quantity is not pictured",
+      "usage_suitability": "Manufacturer-hosted product image. Website reuse permission is unconfirmed.",
+      "ambiguity": "The manufacturer UPC is recorded below. Brown Derby item IDs resemble UPCs with the first zero and final check digit removed, but this mapping has not been confirmed by the inventory source. Compare current packaging; case quantity has not been independently established.",
+      "supporting_sources": [
+        {
+          "label": "Manufacturer SmartLabel: size and UPC",
+          "url": "https://smartlabel.darefoods.com/055653434900-0001-en-CA/index.html"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Manufacturer UPC 055653434900; inventory item 5565343490. Confirm supplier barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Dare brand appears on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer identifies Dare Mallow Summer Peach."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Summer Peach appears on the manufacturer product page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "150 g shown by the manufacturer product page and package."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "One retail bag is pictured; confirm packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "unknown",
+          "detail": "Inventory lists 12 units per case; manufacturer product page does not establish case quantity."
+        }
+      }
+    }
+  },
+  {
+    "product_id": "5565343480",
+    "candidate_id": "dare-5565343480-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/realmallow-marshmallow-strawberries/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2021/07/Seasonal_Sweet-Strawberry_150g.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong brand, flavour and size evidence; confirm supplier SKU and current packaging",
+      "image_scope": "Single retail bag; case quantity is not pictured",
+      "usage_suitability": "Manufacturer-hosted product image. Website reuse permission is unconfirmed.",
+      "ambiguity": "The manufacturer UPC is recorded below. Brown Derby item IDs resemble UPCs with the first zero and final check digit removed, but this mapping has not been confirmed by the inventory source. Compare current packaging; case quantity has not been independently established.",
+      "supporting_sources": [
+        {
+          "label": "Manufacturer SmartLabel: size and UPC",
+          "url": "https://smartlabel.darefoods.com/055653434801-0001-en-CA/index.html"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Manufacturer UPC 055653434801; inventory item 5565343480. Confirm supplier barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Dare brand appears on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer identifies Dare Mallow Sweet Strawberry."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Sweet Strawberry appears on the manufacturer product page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "150 g shown by the manufacturer product page and package."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "One retail bag is pictured; confirm packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "unknown",
+          "detail": "Inventory lists 12 units per case; manufacturer product page does not establish case quantity."
+        }
+      }
+    }
+  },
+  {
+    "product_id": "5565343470",
+    "candidate_id": "dare-5565343470-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/realmallow-marshmallow-bananas/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2022/01/Seasonal_Tropical-Banana_150g.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong brand, flavour and size evidence; confirm supplier SKU and current packaging",
+      "image_scope": "Single retail bag; case quantity is not pictured",
+      "usage_suitability": "Manufacturer-hosted product image. Website reuse permission is unconfirmed.",
+      "ambiguity": "The manufacturer UPC is recorded below. Brown Derby item IDs resemble UPCs with the first zero and final check digit removed, but this mapping has not been confirmed by the inventory source. Compare current packaging; case quantity has not been independently established.",
+      "supporting_sources": [
+        {
+          "label": "Manufacturer SmartLabel: size and UPC",
+          "url": "https://smartlabel.darefoods.com/055653434702-0001-en-CA/index.html"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Manufacturer UPC 055653434702; inventory item 5565343470. Confirm supplier barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Dare brand appears on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer identifies Dare Mallow Tropical Banana."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Tropical Banana appears on the manufacturer product page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "150 g shown by the manufacturer product page and package."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "One retail bag is pictured; confirm packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "unknown",
+          "detail": "Inventory lists 12 units per case; manufacturer product page does not establish case quantity."
+        }
+      }
+    }
   }
 ]

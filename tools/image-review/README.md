@@ -1,14 +1,14 @@
 # Brown Derby product image review
 
-This is a private local review desk, separate from the public website. Every current catalog item has a queue row. Research proposals never become approvals automatically. This first stage includes four manufacturer image candidates; remaining items are explicitly marked as needing research.
+This is a private local review desk, separate from the public website. Every current catalog item has a queue row. Research proposals never become approvals automatically. Manufacturer candidates are prepared in recorded batches; remaining items are explicitly marked as needing research.
 
 ## Open and resume
 
 Python 3.10 or later is required; no third-party Python libraries are needed. Double-click `Open Review Desk.cmd` to launch or resume. The server stays hidden and the desk opens in your browser. Double-click `Close Review Desk.cmd` to stop it without losing decisions. You can also run `python review.py serve` in this folder, then open the printed local address and use Ctrl+C to close it. Decisions persist in `state/review.sqlite3`; cached image bytes live in `state/assets/`.
 
-Search by exact item ID or name, filter by status/category, and navigate 25-item pages. Click the image to inspect the original snapshot. Review all seven match dimensions and the source/usage notes. Approval and rejection both require your name. Approval also requires product-match and image-use confirmations, resolution notes for unknown fields, and an explicit replacement checkbox when an existing approval is present. There is no batch-approval action.
+Search by exact item ID or name, filter by status/category, and navigate 25-item pages. Click the image to inspect the original snapshot. The sticky **Add** button above the product saves one explicit approval immediately and advances to the next ready item. There is no second verification screen or batch approval. The product sheet and approved list in `exports/` update after each decision. The named **Replace approved image** action explicitly approves a replacement while retaining the previous decision in history. Rejections use a reason form.
 
-`Add / replace image` uploads a PNG/JPEG/WebP proposal for the currently selected exact product ID. Record its source and uncertainty. Uploading preserves existing approvals. Candidates are immutable; corrected metadata or images must be a new proposal. Rights are not inferred from a manufacturer source. Confirm permission or another suitable use basis yourself before approval.
+**Choose another image** uploads a PNG/JPEG/WebP proposal for the selected exact product ID. Uploading preserves existing approvals. Candidates are immutable; corrected metadata or images must be a new proposal. A visual Add decision records image approval, not a claim of licensing permission or proof that uncertain research fields were independently resolved. Source, uncertainty and usage notes remain factual and visible. Legacy verification-form approvals remain valid.
 
 ## Import or extend research
 
@@ -38,7 +38,7 @@ Back up the SQLite database **and** the `state/assets` directory together; the B
 
 SQLite audit records and immutable candidates guard against accidental changes through the app, not malicious editing by someone with direct filesystem access. Stale browser decisions and repeated submissions are refused. Image bytes are rechecked on approval and export. User names are self-entered, not authenticated identities. No live manufacturer URL is used by the public website.
 
-The complete image search is still pending for 2,504 items. The first batch uses Dare pages and its foodservice case list. SKU relationships and packaging versions remain marked uncertain; source availability is not proof of reuse rights. Continue in recorded batches. There is no automated background search, approval, or publishing job.
+The complete inventory image search remains in progress. The initial batches use manufacturer pages and supporting case lists. SKU relationships and packaging versions remain marked uncertain; source availability is not proof of reuse rights. Continue in recorded batches. There is no automated background search, approval, or publishing job.
 
 ## Verification
 

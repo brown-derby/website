@@ -177,7 +177,8 @@ class Queue:
     def decide(self, body):
         if body.get("action") not in ("approve", "reject"):
             raise ValueError("Choose approve or reject for one candidate.")
-        if not str(body.get("reviewer", "")).strip():
+        one_click = body.get("approval_method") == "one_click_add" and body.get("action") == "approve"
+        if not one_click and not str(body.get("reviewer", "")).strip():
             raise ValueError("Enter your name to record the decision.")
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -191,14 +192,21 @@ class Queue:
                 raise ValueError("Candidate is already decided or belongs to an earlier inventory revision.")
             detail = dict(body)
             detail["product_name"] = product["name"]
-            detail["reviewer"] = str(body["reviewer"]).strip()
+            detail["reviewer"] = str(body.get("reviewer") or "Local review desk user").strip()
             detail["previous_approved"] = product["approved_candidate"]
             if body["action"] == "approve":
-                if body.get("match_confirmed") is not True or body.get("usage_confirmed") is not True:
+                if one_click:
+                    if body.get("image_confirmed") is not True:
+                        raise ValueError("An explicit Add decision is required.")
+                    # A visual Add decision does not assert image licensing or
+                    # resolve the recorded research uncertainties.
+                    detail["match_confirmed"] = True
+                    detail["usage_confirmed"] = False
+                elif body.get("match_confirmed") is not True or body.get("usage_confirmed") is not True:
                     raise ValueError("Explicit product match and image-use confirmations are required.")
                 evidence = json.loads(candidate["payload"])
                 uncertain = any(x["status"] not in ("matched", "not_applicable") for x in evidence["match"].values())
-                if uncertain and not str(body.get("note", "")).strip():
+                if uncertain and not one_click and not str(body.get("note", "")).strip():
                     raise ValueError("Record how you resolved the uncertain match fields.")
                 if product["approved_candidate"] and body.get("replace_confirmed") is not True:
                     raise ValueError("Explicit confirmation is required to replace the existing approved image.")
@@ -232,7 +240,8 @@ class Queue:
                 if not event or candidate["status"] != "approved" or candidate["product_revision"] != product["revision"]:
                     raise ValueError("Invalid approval state; export refused.")
                 decision = json.loads(event["payload"])
-                if decision.get("match_confirmed") is not True or decision.get("usage_confirmed") is not True:
+                one_click = decision.get("approval_method") == "one_click_add" and decision.get("image_confirmed") is True
+                if decision.get("match_confirmed") is not True or (not one_click and decision.get("usage_confirmed") is not True):
                     raise ValueError("Missing explicit approval confirmations.")
                 self.verify_asset(candidate)
                 evidence = json.loads(candidate["payload"])
@@ -245,7 +254,10 @@ class Queue:
                     "sourceUrl": evidence.get("source_url", ""),
                     "sourceType": evidence["source_type"],
                     "sourceNote": evidence.get("source_note", ""), "matchConfirmed": True,
-                    "usageConfirmed": True, "previousApproved": decision.get("previous_approved"),
+                    "usageConfirmed": decision.get("usage_confirmed") is True,
+                    "approvalMethod": "one_click_add" if one_click else "verification_form",
+                    "imageConfirmed": True, "usageSuitability": evidence["usage_suitability"],
+                    "previousApproved": decision.get("previous_approved"),
                 }
         return entries
 
@@ -376,7 +388,21 @@ def serve(queue, port):
                     threading.Thread(target=self.server.shutdown, daemon=True).start()
                     return
                 if self.path == "/api/decision":
-                    return self.send({"event_id": queue.decide(body)})
+                    event_id = queue.decide(body)
+                    # The durable decision is authoritative, even if an optional
+                    # companion-file export fails after it has been saved.
+                    warning = None
+                    try:
+                        exports = ROOT / "exports"
+                        exports.mkdir(exist_ok=True)
+                        for name, data in (("approved-product-images.json", (json.dumps(queue.approved(), indent=2) + "\n").encode()),
+                                           ("product-image-master.csv", queue.master_csv())):
+                            temporary = exports / (name + "." + str(uuid.uuid4()) + ".tmp")
+                            temporary.write_bytes(data)
+                            temporary.replace(exports / name)
+                    except (ValueError, OSError) as error:
+                        warning = "Decision saved; export needs retry: " + str(error)
+                    return self.send({"event_id": event_id, "warning": warning})
                 if self.path == "/api/candidate":
                     data = base64.b64decode(body["image_base64"], validate=True)
                     return self.send({"candidate_id": queue.add(body["product_id"], body["evidence"], data)})
