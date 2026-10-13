@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-type Product = { id: string; name: string; category: string };
+type Product = { id: string; name: string; category: string; imageUrl?: string };
 
 type PortalUser = {
   email: string;
@@ -95,7 +95,12 @@ function ProductTable({
           {items.map((product) => (
             <tr key={product.id}>
               <td className="item-id">{product.id}</td>
-              <td className="product-name-cell">{product.name}</td>
+              <td className="product-name-cell">
+                <div className="catalog-product-with-image">
+                  {product.imageUrl && <img src={product.imageUrl} alt={product.name} width={64} height={64} loading="lazy" />}
+                  <span>{product.name}</span>
+                </div>
+              </td>
               {showCategory && <td>{product.category}</td>}
               {showPrices && (
                 <td className="price-column">

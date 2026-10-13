@@ -1846,3 +1846,6 @@ h2 {
     width: 100%;
   }
 }
+/* Only approved, immutable local product image snapshots appear in catalog rows. */
+.catalog-product-with-image { display: flex; align-items: center; gap: 14px; }
+.catalog-product-with-image img { flex: 0 0 64px; object-fit: contain; background: #fff; border-radius: 4px; }

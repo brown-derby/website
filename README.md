@@ -35,3 +35,5 @@ npm run check:seo
 The SEO check uses the production build and starts and stops its own local server. See [SEO.md](SEO.md) for the sitemap allowlist, metadata and schema conventions, dependency audit follow-up, and owner-managed Google tasks.
 
 Production is deployed automatically from `main` through Vercel. Review feature work in a pull request before merging to `main`, then verify the live deployment.
+
+The private local [product image review desk](tools/image-review/README.md) stages image candidates and persists explicit decisions. Only approved images can be synced into the public catalog; run `npm run check:images` before releasing image changes. Candidate files and review state are never served by the website.
