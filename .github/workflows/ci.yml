@@ -28,6 +28,12 @@ jobs:
       - name: Type check
         run: npm run check
 
+      - name: Validate approved image bindings and bytes
+        run: npm run check:images
+
+      - name: Verify review approval and persistence safeguards
+        run: python3 -m unittest discover -s tools/image-review -p test_review.py
+
       - name: Build
         run: npm run build
 

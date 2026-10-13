@@ -1,0 +1,202 @@
+[
+  {
+    "product_id": "5565317315",
+    "candidate_id": "dare-breaktime-17315-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/breaktime-chocolate-chip-cookies/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2025/11/DARE_C1.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong product/size/case evidence; SKU relationship unverified",
+      "image_scope": "Single 250 g retail box; not a photograph of the 12-unit case",
+      "usage_suitability": "Manufacturer-hosted image suitable for visual inspection. Reuse permission has not been established; confirm before publication.",
+      "ambiguity": "Confirm Brown Derby item number against supplier SKU/barcode, current physical packaging, and use of a single-unit image for a 12-unit case. No reuse permission was inferred.",
+      "supporting_sources": [
+        {
+          "label": "Dare foodservice case list (page 4)",
+          "url": "https://www.darefoods.com/wp-content/uploads/2025/01/Foodservice-Product-List.pdf"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Dare ICN 17315 is listed. Brown Derby ID 5565317315 is not explicitly listed as such; verify the supplier/barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Breaktime by Dare is shown on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer lists Breaktime Chocolatey Chip cookies; compare with the exact inventory name shown above."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Chocolatey Chip is visible on the package and manufacturer page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "250 g appears on the image and manufacturer page."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "The image shows a retail box. Confirm this packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "matched",
+          "detail": "Dare foodservice list specifies 12 x 250 g for ICN 17315; image shows one unit."
+        }
+      }
+    }
+  },
+  {
+    "product_id": "5565317325",
+    "candidate_id": "dare-breaktime-17325-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/breaktime-coconut/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2025/11/DARE_C1-2.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong product/size/case evidence; SKU relationship unverified",
+      "image_scope": "Single 250 g retail box; not a photograph of the 12-unit case",
+      "usage_suitability": "Manufacturer-hosted image suitable for visual inspection. Reuse permission has not been established; confirm before publication.",
+      "ambiguity": "Confirm Brown Derby item number against supplier SKU/barcode, current physical packaging, and use of a single-unit image for a 12-unit case. No reuse permission was inferred.",
+      "supporting_sources": [
+        {
+          "label": "Dare foodservice case list (page 4)",
+          "url": "https://www.darefoods.com/wp-content/uploads/2025/01/Foodservice-Product-List.pdf"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Dare ICN 17325 is listed. Brown Derby ID 5565317325 is not explicitly listed as such; verify the supplier/barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Breaktime by Dare is shown on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer lists Breaktime Coconut cookies; compare with the exact inventory name shown above."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Coconut is visible on the package and manufacturer page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "250 g appears on the image and manufacturer page."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "The image shows a retail box. Confirm this packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "matched",
+          "detail": "Dare foodservice list specifies 12 x 250 g for ICN 17325; image shows one unit."
+        }
+      }
+    }
+  },
+  {
+    "product_id": "5565317265",
+    "candidate_id": "dare-breaktime-17265-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/breaktime-ginger-cookies/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2025/11/Dare_Cookies-Breaktime-Ginger_250g_en.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong product/size/case evidence; SKU relationship unverified",
+      "image_scope": "Single 250 g retail box; not a photograph of the 12-unit case",
+      "usage_suitability": "Manufacturer-hosted image suitable for visual inspection. Reuse permission has not been established; confirm before publication.",
+      "ambiguity": "Confirm Brown Derby item number against supplier SKU/barcode, current physical packaging, and use of a single-unit image for a 12-unit case. No reuse permission was inferred.",
+      "supporting_sources": [
+        {
+          "label": "Dare foodservice case list (page 4)",
+          "url": "https://www.darefoods.com/wp-content/uploads/2025/01/Foodservice-Product-List.pdf"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Dare ICN 17265 is listed. Brown Derby ID 5565317265 is not explicitly listed as such; verify the supplier/barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Breaktime by Dare is shown on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer lists Breaktime Ginger cookies; compare with the exact inventory name shown above."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Ginger is visible on the package and manufacturer page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "250 g appears on the image and manufacturer page."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "The image shows a retail box. Confirm this packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "matched",
+          "detail": "Dare foodservice list specifies 12 x 250 g for ICN 17265; image shows one unit."
+        }
+      }
+    }
+  },
+  {
+    "product_id": "5565317335",
+    "candidate_id": "dare-breaktime-17335-20261013-v1",
+    "evidence": {
+      "source_type": "manufacturer",
+      "source_url": "https://www.darefoods.com/product/breaktime-oatmeal-cookies/",
+      "image_url": "https://www.darefoods.com/wp-content/uploads/2025/11/DARE_C1-4.jpg",
+      "research_date": "2026-10-13",
+      "confidence": "Strong product/size/case evidence; SKU relationship unverified",
+      "image_scope": "Single 250 g retail box; not a photograph of the 12-unit case",
+      "usage_suitability": "Manufacturer-hosted image suitable for visual inspection. Reuse permission has not been established; confirm before publication.",
+      "ambiguity": "Confirm Brown Derby item number against supplier SKU/barcode, current physical packaging, and use of a single-unit image for a 12-unit case. No reuse permission was inferred.",
+      "supporting_sources": [
+        {
+          "label": "Dare foodservice case list (page 4)",
+          "url": "https://www.darefoods.com/wp-content/uploads/2025/01/Foodservice-Product-List.pdf"
+        }
+      ],
+      "match": {
+        "sku": {
+          "status": "ambiguous",
+          "detail": "Dare ICN 17335 is listed. Brown Derby ID 5565317335 is not explicitly listed as such; verify the supplier/barcode relationship."
+        },
+        "brand": {
+          "status": "matched",
+          "detail": "Breaktime by Dare is shown on the manufacturer page and package."
+        },
+        "product_name": {
+          "status": "matched",
+          "detail": "Manufacturer lists Breaktime Oatmeal cookies; compare with the exact inventory name shown above."
+        },
+        "flavor": {
+          "status": "matched",
+          "detail": "Oatmeal is visible on the package and manufacturer page."
+        },
+        "size": {
+          "status": "matched",
+          "detail": "250 g appears on the image and manufacturer page."
+        },
+        "format": {
+          "status": "ambiguous",
+          "detail": "The image shows a retail box. Confirm this packaging version against current stock."
+        },
+        "case_pack": {
+          "status": "matched",
+          "detail": "Dare foodservice list specifies 12 x 250 g for ICN 17335; image shows one unit."
+        }
+      }
+    }
+  }
+]
