@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import AccountApprovals from "./AccountApprovals";
 
 type OrderItem = {
   id?: number;
@@ -51,6 +52,9 @@ function prettyDate(value: string | null) {
 
 export default function PortalClient() {
   const [user, setUser] = useState<User | null>(null);
+  const [approvalStatus, setApprovalStatus] = useState("pending");
+  const [pricingApproved, setPricingApproved] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState("");
@@ -89,6 +93,14 @@ export default function PortalClient() {
     }
     const sessionData = await sessionResponse.json();
     setUser(sessionData.user);
+    setApprovalStatus(sessionData.approvalStatus);
+    setPricingApproved(sessionData.pricingApproved === true);
+    setIsAdmin(sessionData.isAdmin === true);
+    setOrders([]);
+    if (!sessionData.pricingApproved) {
+      setLoading(false);
+      return;
+    }
 
     const orderResponse = await fetch("/api/orders", { cache: "no-store" });
     const orderData = await orderResponse.json().catch(() => ({}));
@@ -233,6 +245,17 @@ export default function PortalClient() {
     return <div className="portal-loading">Loading your account…</div>;
   }
 
+  if (!pricingApproved) {
+    return <div className="current-order-card">
+      <p className="eyebrow">{user?.businessName || user?.email}</p>
+      <h2>{approvalStatus === "declined" ? "Account access has not been approved" : approvalStatus === "unavailable" ? "Account status temporarily unavailable" : "Your account is awaiting approval"}</h2>
+      <p>{approvalStatus === "unavailable" ? "Please try again shortly." : "Brown Derby must approve your account before you can see wholesale prices or place orders. You can continue browsing our products."}</p>
+      <p>For help, contact <a href="mailto:csr@brownderby.ca">csr@brownderby.ca</a> or call <a href="tel:+17094892299">709-489-2299</a>.</p>
+      <div className="approval-actions"><button type="button" className="button button-primary" onClick={() => loadPortal()}>Check approval status</button><Link href="/products" className="button button-secondary">Browse products</Link><button type="button" className="portal-text-button" onClick={logout}>Sign out</button></div>
+      {isAdmin && <AccountApprovals />}
+    </div>;
+  }
+
   return (
     <div className="account-portal">
       <div className="account-toolbar">
@@ -248,6 +271,7 @@ export default function PortalClient() {
 
       {message && <div className="portal-message success">{message}</div>}
       {error && <div className="portal-message error">{error}</div>}
+      {isAdmin && <AccountApprovals />}
 
       <section className="current-order-card">
         <div className="current-order-heading">

@@ -60,6 +60,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     signedIn: false,
-    message: "Check your email to confirm your account, then sign in.",
+    message: "Check your email to confirm your account. Brown Derby must approve your account before you can see pricing or place orders.",
   });
 }

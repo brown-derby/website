@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDraftForUser, updateDraftNotes } from "../../../../lib/order-server";
-import { getSession, portalConfigured, sameOrigin } from "../../../../lib/portal";
+import { getSession, pricingDenied, portalConfigured, sameOrigin } from "../../../../lib/portal";
 
 export async function GET() {
   if (!portalConfigured()) {
@@ -10,6 +10,12 @@ export async function GET() {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+  if (!session.pricingApproved) {
+    return NextResponse.json(pricingDenied(session), {
+      status: session.approvalStatus === "unavailable" ? 503 : 403,
+      headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
+    });
   }
 
   try {
@@ -28,6 +34,12 @@ export async function PATCH(request: NextRequest) {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+  if (!session.pricingApproved) {
+    return NextResponse.json(pricingDenied(session), {
+      status: session.approvalStatus === "unavailable" ? 503 : 403,
+      headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
+    });
   }
 
   const body = await request.json().catch(() => null);

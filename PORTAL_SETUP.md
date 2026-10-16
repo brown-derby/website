@@ -31,3 +31,29 @@ Security design:
   been emailed to Brown Derby.
 
 After Supabase is connected, run supabase/schema.sql in its SQL editor.
+
+
+## Account approval
+
+Apply `supabase/account-approval.sql` after the base schema. New and existing
+accounts default to pending. The confirmed owner account `csr@brownderby.ca`
+is enrolled separately in `private.portal_admins` by a trusted database operator;
+registration and editable user metadata cannot assign administrator access.
+
+Sign in as the owner at `/account` and use **Customer approvals** to approve,
+decline, or revoke access. Pricing and order APIs check fresh database approval
+on each request. Restrictive database policies also block pending/declined users
+from reading historical order prices through direct Supabase REST access.
+Customers must confirm their email and be approved. Refreshing the catalog or
+account page picks up an approval immediately without signing out.
+
+The review operation records administrator, decision, and timestamp in the private
+audit table. Customers cannot update approval records or promote themselves.
+No service-role key is used. No approval emails are sent automatically.
+
+Validation: `npm run check`, `npm run build`, and
+`node scripts/check-account-approval.mjs`. The integration check uses a local
+Auth/Data API fixture, with no customer credentials or external emails. Run
+`supabase/test-account-approval.sql` against the database to test actual RLS,
+self-approval denial, admin approval/revocation, and audit records; all test data
+and decisions are rolled back.

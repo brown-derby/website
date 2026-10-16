@@ -24,7 +24,11 @@ export function sameOrigin(request: NextRequest) {
   const origin = request.headers.get("origin");
   if (!origin) return true;
   try {
-    return new URL(origin).origin === request.nextUrl.origin;
+    const source = new URL(origin);
+    // Next.js may construct nextUrl with an internal localhost origin behind a
+    // proxy. The HTTP Host is the public host the browser actually requested.
+    return ["https:", "http:"].includes(source.protocol) &&
+      source.host === (request.headers.get("host") || request.nextUrl.host);
   } catch {
     return false;
   }
@@ -73,6 +77,7 @@ type AuthPayload = {
 export type PortalUser = {
   id: string;
   email?: string;
+  email_confirmed_at?: string;
   user_metadata?: {
     business_name?: string;
     contact_name?: string;
@@ -132,7 +137,7 @@ export async function getSession() {
 
   if (accessToken) {
     const user = await userFromToken(accessToken);
-    if (user) return { user, accessToken };
+    if (user) return sessionWithAccess(user, accessToken);
   }
 
   if (!refreshToken) return null;
@@ -151,7 +156,38 @@ export async function getSession() {
   await setSessionCookies(payload);
   accessToken = payload.access_token;
   const user = payload.user || (await userFromToken(accessToken));
-  return user ? { user, accessToken } : null;
+  return user ? sessionWithAccess(user, accessToken) : null;
+}
+
+async function sessionWithAccess(user: PortalUser, accessToken: string) {
+  // Read approval from the database on every request. User-editable metadata
+  // and stale JWT claims must never grant pricing or administrator access.
+  let approvalStatus = "unavailable";
+  let isAdmin = false;
+  try {
+    const response = await databaseRequest("rpc/portal_access", accessToken, {
+      method: "POST", body: "{}",
+    });
+    if (response.ok) {
+      const access = await response.json();
+      approvalStatus = ["pending", "approved", "declined"].includes(access.status)
+        ? access.status : "pending";
+      isAdmin = access.isAdmin === true && Boolean(user.email_confirmed_at);
+    }
+  } catch { /* Fail closed when approval cannot be checked. */ }
+  return {
+    user, accessToken, approvalStatus, isAdmin,
+    pricingApproved: approvalStatus === "approved" && Boolean(user.email_confirmed_at),
+  };
+}
+
+export function pricingDenied(session: NonNullable<Awaited<ReturnType<typeof getSession>>>) {
+  return {
+    error: session.approvalStatus === "unavailable"
+      ? "Unable to check account approval. Please try again shortly."
+      : "Your account must be approved by Brown Derby before viewing pricing or ordering.",
+    approvalStatus: session.approvalStatus,
+  };
 }
 
 export function customerSnapshot(user: PortalUser) {

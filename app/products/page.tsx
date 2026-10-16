@@ -20,7 +20,7 @@ export default function ProductsPage() {
             Search by product name or item number, or browse our catalog by category.
             Brown Derby supplies wholesale food, beverages, confectionery, packaging,
             cleaning products and restaurant supplies from Grand Falls-Windsor,
-            Newfoundland. Sign in to see wholesale pricing and place an order.
+            Newfoundland. Sign in with an approved account to see wholesale pricing and place an order.
           </p>
           <nav aria-label="Wholesale category guides">
             <CategoryLinks />

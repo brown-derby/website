@@ -123,7 +123,7 @@ export default function LoginPortal() {
           <p>
             {mode === "signin"
               ? "Use the email and password attached to your Brown Derby portal account."
-              : "Create an account with your business email. Email confirmation may be required before your first sign in."}
+              : "Create an account with your business email and confirm your email address. Brown Derby will review your account before enabling pricing and ordering."}
           </p>
         </div>
 

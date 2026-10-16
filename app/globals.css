@@ -1849,3 +1849,10 @@ h2 {
 /* Only approved, immutable local product image snapshots appear in catalog rows. */
 .catalog-product-with-image { display: flex; align-items: center; gap: 14px; }
 .catalog-product-with-image img { flex: 0 0 64px; object-fit: contain; background: #fff; border-radius: 4px; }
+.approval-filter { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.approval-filter select { padding: 9px; border: 1px solid #bbb; border-radius: 4px; font: inherit; }
+.approval-list { display: grid; gap: 14px; }
+.approval-card { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 6px; }
+.approval-card h3, .approval-card p { margin: 0 0 6px; overflow-wrap: anywhere; }
+.approval-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
+@media (max-width: 650px) { .approval-card { align-items: flex-start; flex-direction: column; } }

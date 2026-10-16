@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { catalogProducts, getCatalogPrice } from "../../../../lib/catalog";
-import { getSession } from "../../../../lib/portal";
+import { getSession, pricingDenied } from "../../../../lib/portal";
 
 // Customer pricing must never be cached by shared proxies.
 export const dynamic = "force-dynamic";
@@ -19,6 +19,11 @@ export async function GET() {
       );
     }
 
+    if (!session.pricingApproved) {
+      return NextResponse.json(pricingDenied(session), {
+        status: session.approvalStatus === "unavailable" ? 503 : 403, headers: privateHeaders,
+      });
+    }
     const prices = Object.fromEntries(
       catalogProducts.map((product) => [product.id, getCatalogPrice(product)])
     );

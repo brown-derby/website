@@ -161,6 +161,7 @@ export default function ProductCatalog({
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
   const [user, setUser] = useState<PortalUser | null>(null);
+  const [pricingApproved, setPricingApproved] = useState(false);
   const [prices, setPrices] = useState<Record<string, number> | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -222,9 +223,10 @@ export default function ProductCatalog({
         if (cancelled) return;
         if (!sessionData.authenticated || !sessionData.user) return;
         setUser(sessionData.user);
+        if (!sessionData.pricingApproved) return;
 
         const priceResponse = await fetch("/api/catalog/prices", { cache: "no-store" });
-        if (priceResponse.status === 401) {
+        if (priceResponse.status === 401 || priceResponse.status === 403) {
           if (!cancelled) setUser(null);
           return;
         }
@@ -232,6 +234,7 @@ export default function ProductCatalog({
           const priceData = await priceResponse.json();
           if (!cancelled && priceData.prices && typeof priceData.prices === "object") {
             setPrices(priceData.prices);
+            setPricingApproved(true);
           }
         }
 
@@ -291,8 +294,8 @@ export default function ProductCatalog({
   }
 
   const tableProps = {
-    orderEnabled: Boolean(user),
-    showPrices: Boolean(user),
+    orderEnabled: pricingApproved,
+    showPrices: pricingApproved,
     prices,
     quantities,
     savingProduct,
@@ -325,7 +328,9 @@ export default function ProductCatalog({
 
       {sessionChecked && (
         <div className={"catalog-order-bar " + (user ? "signed-in" : "")}>
-          {user ? (
+          {user && !pricingApproved ? (
+            <><div><strong>Your account is awaiting pricing approval</strong><span>Brown Derby must approve your account before pricing and ordering become available.</span></div><Link href="/account">Check account status →</Link></>
+          ) : user ? (
             <>
               <div>
                 <strong>Ordering as {user.businessName || user.email}</strong>
@@ -342,7 +347,7 @@ export default function ProductCatalog({
             <>
               <div>
                 <strong>Sign in to see wholesale pricing</strong>
-                <span>Customer pricing and online ordering are available after sign-in.</span>
+                <span>Create an account and receive Brown Derby approval to access pricing and online ordering.</span>
               </div>
               <Link href="/login">Customer sign in →</Link>
             </>

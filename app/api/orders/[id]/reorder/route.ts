@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { setDraftItem, getOrderForUser } from "../../../../../lib/order-server";
-import { getSession, sameOrigin } from "../../../../../lib/portal";
+import { getSession, pricingDenied, sameOrigin } from "../../../../../lib/portal";
 
 export async function POST(
   request: NextRequest,
@@ -13,6 +13,12 @@ export async function POST(
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+  if (!session.pricingApproved) {
+    return NextResponse.json(pricingDenied(session), {
+      status: session.approvalStatus === "unavailable" ? 503 : 403,
+      headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
+    });
   }
 
   const { id } = await context.params;
