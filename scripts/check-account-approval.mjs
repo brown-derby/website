@@ -6,6 +6,7 @@ import { setTimeout as delay } from "node:timers/promises";
 
 const accountId = "11111111-1111-4111-8111-111111111111";
 let status = "pending";
+const emailRedirects = [];
 const mock = http.createServer(async (req, res) => {
   let raw = ""; for await (const chunk of req) raw += chunk;
   const body = raw ? JSON.parse(raw) : {};
@@ -14,6 +15,9 @@ const mock = http.createServer(async (req, res) => {
   if (req.url.startsWith("/auth/v1/token")) {
     const role = body.email?.startsWith("admin") ? "admin" : "customer";
     data = { access_token: role, refresh_token: role, expires_in: 3600 };
+  } else if (req.url.startsWith("/auth/v1/recover?") || req.url.startsWith("/auth/v1/signup?")) {
+    emailRedirects.push(new URL(req.url, "http://localhost").searchParams.get("redirect_to"));
+    data = {};
   } else if (req.url === "/auth/v1/user") {
     data = { id: accountId, email: `${token}@example.test`, email_confirmed_at: token === "unconfirmed" ? null : "2026-10-16T00:00:00Z", user_metadata: { business_name: "Test Business", approved: true, isAdmin: true } };
   } else if (req.url === "/rest/v1/rpc/portal_access") {
@@ -45,6 +49,11 @@ try {
   assert.ok(ready, "Test server started");
   const login = await request("/api/auth/login", null, { method: "POST", headers: { Origin: base, "Content-Type": "application/json" }, body: JSON.stringify({ email: "customer@example.test", password: "local-test-password" }) });
   assert.equal(login.status, 200, "Browser-origin sign-in works behind the Next.js proxy");
+  const reset = await request("/api/auth/reset", null, { method: "POST", headers: { Origin: base, "Content-Type": "application/json" }, body: JSON.stringify({ email: "customer@example.test" }) });
+  assert.equal(reset.status, 200);
+  const signup = await request("/api/auth/signup", null, { method: "POST", headers: { Origin: base, "Content-Type": "application/json" }, body: JSON.stringify({ email: "new@example.test", password: "local-test-password", businessName: "Test Business" }) });
+  assert.equal(signup.status, 200);
+  assert.deepEqual(emailRedirects, ["https://brownderby.ca/reset-password", "https://brownderby.ca/login?confirmed=1"], "Account emails use the public website even when the server sees localhost");
   assert.equal((await request("/api/catalog/prices")).status, 401);
   assert.equal((await request("/api/catalog/prices", "customer")).status, 403);
   assert.equal((await request("/api/catalog/prices", "unconfirmed")).status, 403);
@@ -72,7 +81,7 @@ try {
   await decide("pending");
   const session = await (await request("/api/auth/session", "customer")).json();
   assert.equal(session.pricingApproved, false); assert.equal(session.isAdmin, false);
-  console.log("Account approval integration checks passed: anonymous, pending, unconfirmed, approved, revoked, unavailable, order routes, admin authorization and CSRF.");
+  console.log("Account approval integration checks passed: email redirects, anonymous, pending, unconfirmed, approved, revoked, unavailable, order routes, admin authorization and CSRF.");
   if (process.argv.includes("--serve")) {
     console.log("Local QA: http://127.0.0.1:3199/login (admin@example.test or customer@example.test; any test password). Ctrl+C to stop.");
     await new Promise(resolve => process.once("SIGINT", resolve));

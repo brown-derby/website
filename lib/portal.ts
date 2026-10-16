@@ -211,3 +211,11 @@ export function orderRecipient() {
 export function siteUrl(fallbackOrigin?: string) {
   return process.env.NEXT_PUBLIC_SITE_URL || fallbackOrigin || "";
 }
+
+export function authEmailRedirect(path: string) {
+  const origin =
+    process.env.NODE_ENV === "development"
+      ? siteUrl("http://localhost:3000")
+      : "https://brownderby.ca";
+  return new URL(path, origin).toString();
+}

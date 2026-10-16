@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  authEmailRedirect,
   authRequest,
   portalConfigured,
   sameOrigin,
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
   if (email) {
-    const redirectTo = request.nextUrl.origin + "/reset-password";
+    const redirectTo = authEmailRedirect("/reset-password");
     await authRequest("/recover?redirect_to=" + encodeURIComponent(redirectTo), {
       method: "POST",
       body: JSON.stringify({ email }),

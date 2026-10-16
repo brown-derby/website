@@ -12,6 +12,15 @@ Required Vercel environment variables:
 - ORDER_EMAIL_TO (defaults to csr@brownderby.ca if omitted)
 - NEXT_PUBLIC_SITE_URL (production site URL)
 
+In Supabase **Authentication → URL Configuration**, set **Site URL** to
+`https://brownderby.ca` and add these exact **Redirect URLs**:
+
+- `https://brownderby.ca/reset-password`
+- `https://brownderby.ca/login?confirmed=1`
+
+Hosted account emails use these production destinations. Development emails use
+`NEXT_PUBLIC_SITE_URL` when set, otherwise `http://localhost:3000`.
+
 Security design:
 
 - Customer passwords are never stored or processed by the Brown Derby database.

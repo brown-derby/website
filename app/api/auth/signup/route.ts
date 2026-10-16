@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  authEmailRedirect,
   authRequest,
   portalConfigured,
   sameOrigin,
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const redirectTo = request.nextUrl.origin + "/login?confirmed=1";
+  const redirectTo = authEmailRedirect("/login?confirmed=1");
   const auth = await authRequest("/signup?redirect_to=" + encodeURIComponent(redirectTo), {
     method: "POST",
     body: JSON.stringify({
