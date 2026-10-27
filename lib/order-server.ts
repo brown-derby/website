@@ -14,6 +14,7 @@ export type OrderItem = {
   category: string;
   unit_price: number | string;
   quantity: number;
+  item_notes: string;
 };
 
 export type CustomerOrder = {
@@ -32,7 +33,7 @@ export type CustomerOrder = {
 };
 
 const orderSelect =
-  "id,user_id,customer_email,customer_business_name,customer_contact_name,status,notes,email_status,submitted_at,created_at,updated_at,order_items(id,product_id,product_name,category,unit_price,quantity)";
+  "id,user_id,customer_email,customer_business_name,customer_contact_name,status,notes,email_status,submitted_at,created_at,updated_at,order_items(id,product_id,product_name,category,unit_price,quantity,item_notes)";
 
 async function jsonOrThrow<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -157,6 +158,7 @@ export async function setDraftItem(
         category: product.category,
         unit_price: getCatalogPrice(product),
         quantity,
+        item_notes: draft.order_items?.find((item) => item.product_id === productId)?.item_notes || "",
       }),
     }
   );
@@ -184,6 +186,7 @@ export async function repriceDraftOrder(
       category: product?.category || item.category,
       unit_price: product ? getCatalogPrice(product) : item.unit_price,
       quantity: item.quantity,
+      item_notes: item.item_notes || "",
     };
   });
 
@@ -221,6 +224,33 @@ export async function updateDraftNotes(userId: string, accessToken: string, note
 
   const rows = await jsonOrThrow<CustomerOrder[]>(response);
   return rows[0] || null;
+}
+
+export async function updateDraftItemNote(
+  userId: string,
+  accessToken: string,
+  productId: string,
+  itemNotes: string
+) {
+  const draft = await getDraftForUser(userId, accessToken);
+  if (!draft || !draft.order_items?.some((item) => item.product_id === productId)) {
+    return null;
+  }
+
+  const response = await databaseRequest(
+    "order_items?order_id=eq." +
+      encodeURIComponent(draft.id) +
+      "&product_id=eq." +
+      encodeURIComponent(productId),
+    accessToken,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ item_notes: itemNotes }),
+    }
+  );
+  const rows = await jsonOrThrow<OrderItem[]>(response);
+  return rows.length ? getDraftForUser(userId, accessToken) : null;
 }
 
 function escapeHtml(value: string) {
@@ -264,6 +294,11 @@ export async function emailOrder(order: CustomerOrder) {
         "</td>" +
         "<td style=\"padding:8px;border-bottom:1px solid #ddd\">" +
         escapeHtml(item.product_name) +
+        (item.item_notes
+          ? "<div style=\"margin-top:7px;color:#6a3a21;font-size:12px;line-height:1.5\"><strong>Item note:</strong> " +
+            escapeHtml(item.item_notes).replace(/\\n/g, "<br>") +
+            "</div>"
+          : "") +
         "</td>" +
         "<td style=\"padding:8px;border-bottom:1px solid #ddd;text-align:right\">" +
         item.quantity +
@@ -312,7 +347,7 @@ export async function emailOrder(order: CustomerOrder) {
     money(total) +
     "</strong></p>" +
     (order.notes
-      ? "<p><strong>Customer notes:</strong><br>" +
+      ? "<p><strong>General order notes:</strong><br>" +
         escapeHtml(order.notes).replace(/\n/g, "<br>") +
         "</p>"
       : "") +
