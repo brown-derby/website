@@ -11,6 +11,7 @@ type OrderItem = {
   category: string;
   unit_price: number | string;
   quantity: number;
+  item_notes: string;
 };
 
 type Order = {
@@ -62,6 +63,8 @@ export default function PortalClient() {
   const [error, setError] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [notes, setNotes] = useState("");
+  const [itemNotes, setItemNotes] = useState<Record<string, string>>({});
+  const [openItemNotes, setOpenItemNotes] = useState<Record<string, boolean>>({});
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
 
   const draft = useMemo(
@@ -75,10 +78,13 @@ export default function PortalClient() {
 
   function syncDraftInputs(order: Order | null) {
     const next: Record<string, number> = {};
+    const nextNotes: Record<string, string> = {};
     for (const item of order?.order_items || []) {
       next[item.product_id] = item.quantity;
+      nextNotes[item.product_id] = item.item_notes || "";
     }
     setQuantities(next);
+    setItemNotes(nextNotes);
     setNotes(order?.notes || "");
   }
 
@@ -157,8 +163,40 @@ export default function PortalClient() {
       ? orders.map((order) => (order.id === draft.id ? data.order : order))
       : [data.order, ...orders];
     setOrders(nextOrders);
-    syncDraftInputs(data.order);
+    setQuantities(Object.fromEntries(
+      (data.order.order_items || []).map((item: OrderItem) => [item.product_id, item.quantity])
+    ));
+    if (quantity === 0) {
+      setItemNotes((current) => {
+        const next = { ...current };
+        delete next[productId];
+        return next;
+      });
+    }
     setMessage(quantity === 0 ? "Item removed." : "Quantity updated.");
+  }
+
+  async function saveItemNote(productId: string) {
+    const itemNote = itemNotes[productId] ?? "";
+    setWorking("note:" + productId);
+    setError("");
+    setMessage("");
+    const response = await fetch("/api/orders/draft/items", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId, notes: itemNote }),
+    });
+    const data = await response.json().catch(() => ({}));
+    setWorking("");
+
+    if (!response.ok) {
+      setError(data.error || "Unable to save the item note.");
+      return;
+    }
+    setOrders((current) =>
+      current.map((order) => order.id === data.order.id ? data.order : order)
+    );
+    setMessage("Item note saved.");
   }
 
   async function saveNotes() {
@@ -203,6 +241,23 @@ export default function PortalClient() {
       setWorking("");
       setError("Unable to save the order notes before submitting.");
       return;
+    }
+
+    // Save any edited item notes even when the customer did not press "Save note".
+    for (const item of draft.order_items || []) {
+      const currentNote = (itemNotes[item.product_id] ?? "").trim();
+      if (currentNote === (item.item_notes || "")) continue;
+      const itemResponse = await fetch("/api/orders/draft/items", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: item.product_id, notes: currentNote }),
+      });
+      if (!itemResponse.ok) {
+        const itemData = await itemResponse.json().catch(() => ({}));
+        setWorking("");
+        setError(itemData.error || "Unable to save an item note before submitting.");
+        return;
+      }
     }
 
     const response = await fetch("/api/orders/" + draft.id + "/submit", {
@@ -313,7 +368,54 @@ export default function PortalClient() {
                   {(draft.order_items || []).map((item) => (
                     <tr key={item.product_id}>
                       <td className="item-id">{item.product_id}</td>
-                      <td>{item.product_name}</td>
+                      <td className="order-item-product-cell">
+                        <div>{item.product_name}</div>
+                        {item.item_notes && !openItemNotes[item.product_id] && (
+                          <p className="order-item-note-preview">Item note: {item.item_notes}</p>
+                        )}
+                        <button
+                          className="order-item-note-toggle"
+                          type="button"
+                          aria-expanded={Boolean(openItemNotes[item.product_id])}
+                          onClick={() => setOpenItemNotes((current) => ({
+                            ...current,
+                            [item.product_id]: !current[item.product_id],
+                          }))}
+                        >
+                          {openItemNotes[item.product_id]
+                            ? "Hide item note"
+                            : item.item_notes ? "Edit item note" : "+ Add item note"}
+                        </button>
+                        {openItemNotes[item.product_id] && (
+                          <div className="order-item-note-editor">
+                            <label htmlFor={"item-note-" + item.product_id}>
+                              Note for this item (optional)
+                            </label>
+                            <textarea
+                              id={"item-note-" + item.product_id}
+                              value={itemNotes[item.product_id] ?? ""}
+                              maxLength={500}
+                              rows={3}
+                              placeholder="E.g. preferred flavour or substitution instructions"
+                              onChange={(event) => setItemNotes((current) => ({
+                                ...current,
+                                [item.product_id]: event.target.value,
+                              }))}
+                            />
+                            <div className="order-item-note-actions">
+                              <small>{(itemNotes[item.product_id] || "").length}/500</small>
+                              <button
+                                className="small-action-button"
+                                type="button"
+                                onClick={() => saveItemNote(item.product_id)}
+                                disabled={working === "note:" + item.product_id}
+                              >
+                                {working === "note:" + item.product_id ? "Saving…" : "Save note"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </td>
                       <td>
                         <input
                           className="portal-qty-input"
@@ -353,12 +455,12 @@ export default function PortalClient() {
 
             <div className="order-notes-total">
               <label className="order-notes">
-                <span>Order notes</span>
+                <span>General order notes (optional)</span>
                 <textarea
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
                   maxLength={2000}
-                  placeholder="Add any delivery, pickup, or order notes here."
+                  placeholder="Any instructions for your whole order, such as pickup or delivery details?"
                 />
                 <button
                   className="portal-text-button"
@@ -481,13 +583,18 @@ export default function PortalClient() {
                 </div>
                 <div className="history-items">
                   {(order.order_items || []).map((item) => (
-                    <div key={item.product_id}>
-                      <span>{item.quantity} × {item.product_name}</span>
-                      <small>{item.product_id}</small>
+                    <div className="history-item" key={item.product_id}>
+                      <div className="history-item-main">
+                        <span>{item.quantity} × {item.product_name}</span>
+                        <small>{item.product_id}</small>
+                      </div>
+                      {item.item_notes && (
+                        <p className="history-item-note">Item note: {item.item_notes}</p>
+                      )}
                     </div>
                   ))}
                 </div>
-                {order.notes && <p className="history-notes">Notes: {order.notes}</p>}
+                {order.notes && <p className="history-notes">General order notes: {order.notes}</p>}
                 <button
                   className="button button-secondary"
                   type="button"
