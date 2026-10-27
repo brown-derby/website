@@ -184,6 +184,11 @@ try {
       assert.ok(tbody, `Category products must be in initial server HTML: ${path}`);
       const expected = products.filter((product) => product.category === category[1]);
       assert.equal((tbody.match(/<tr>/g) || []).length, expected.length, path);
+      // Catalog rows are collapsed by default: each row exposes only an item
+      // number and name until the customer activates its accessible toggle.
+      assert.equal((tbody.match(/class="product-accordion-toggle"/g) || []).length, expected.length, path);
+      assert.equal((tbody.match(/aria-expanded="false"/g) || []).length, expected.length, path);
+      assert.doesNotMatch(tbody, /<img\\b|<input\\b|product-accordion-details/, path);
       assert.match(tbody, new RegExp(expected[0].id));
     }
   }
