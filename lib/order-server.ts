@@ -296,7 +296,7 @@ export async function emailOrder(order: CustomerOrder) {
         escapeHtml(item.product_name) +
         (item.item_notes
           ? "<div style=\"margin-top:7px;color:#6a3a21;font-size:12px;line-height:1.5\"><strong>Item note:</strong> " +
-            escapeHtml(item.item_notes).replace(/\\n/g, "<br>") +
+            escapeHtml(item.item_notes).replace(/\n/g, "<br>") +
             "</div>"
           : "") +
         "</td>" +
