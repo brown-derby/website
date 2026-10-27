@@ -33,7 +33,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           { name: category.category, path: `/products/${category.slug}` },
         ]}
       />
-      <section className="page-hero category-page-hero">
+      <section className="page-hero product-page-hero category-page-hero">
         <div className="shell">
           <nav aria-label="Breadcrumb" className="category-breadcrumb">
             <Link href="/">Home</Link>
@@ -42,9 +42,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             <span aria-hidden="true"> / </span>
             <span aria-current="page">{category.category}</span>
           </nav>
-          <p className="eyebrow">Brown Derby Wholesale · Grand Falls-Windsor</p>
           <h1>{category.heading}</h1>
-          <p>{category.intro}</p>
+          <p>
+            Search by product name or item number in this category.
+            Sign in to view wholesale prices and add items to your order.
+          </p>
         </div>
       </section>
 
@@ -56,6 +58,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       <section className="section category-ordering">
         <div className="shell">
+          <p className="category-intro-after-catalog">{category.intro}</p>
           <div className="section-heading">
             <h2>{category.buyingHeading}</h2>
             <p>{category.buyingAdvice}</p>
