@@ -1542,7 +1542,7 @@ h2 {
   padding: 17px 0;
 }
 
-.history-items > div {
+.history-item-main {
   display: flex;
   justify-content: space-between;
   gap: 18px;
@@ -1692,7 +1692,7 @@ h2 {
     min-width: 790px;
   }
 
-  .history-items > div {
+  .history-item-main {
     align-items: flex-start;
     flex-direction: column;
     gap: 3px;
@@ -1856,3 +1856,84 @@ h2 {
 .approval-card h3, .approval-card p { margin: 0 0 6px; overflow-wrap: anywhere; }
 .approval-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
 @media (max-width: 650px) { .approval-card { align-items: flex-start; flex-direction: column; } }
+
+
+/* Optional notes per order line. The editor stays hidden until requested. */
+.order-item-product-cell {
+  min-width: 230px;
+  max-width: 440px;
+  overflow-wrap: anywhere;
+}
+
+.order-item-note-toggle {
+  display: inline-block;
+  margin-top: 7px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--brown);
+  cursor: pointer;
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.order-item-note-preview,
+.history-item-note {
+  margin: 6px 0 0;
+  font-size: .78rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.order-item-note-editor {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  max-width: 360px;
+}
+
+.order-item-note-editor label {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.order-item-note-editor textarea {
+  display: block;
+  width: 100%;
+  min-height: 82px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: .88rem;
+  resize: vertical;
+}
+
+.order-item-note-editor textarea:focus {
+  outline: 2px solid var(--brown);
+  outline-offset: 2px;
+}
+
+.order-item-note-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.order-item-note-actions small {
+  color: var(--ink-soft);
+}
+
+.history-item {
+  display: grid;
+  gap: 2px;
+}

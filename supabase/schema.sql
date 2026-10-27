@@ -25,6 +25,7 @@ create table if not exists public.order_items (
   category text not null,
   unit_price numeric(12,2) not null check (unit_price >= 0),
   quantity integer not null check (quantity > 0 and quantity <= 9999),
+  item_notes text not null default '' check (char_length(item_notes) <= 500),
   created_at timestamptz not null default now(),
   unique (order_id, product_id)
 );
