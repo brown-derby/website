@@ -2079,3 +2079,225 @@ h2 {
   display: grid;
   gap: 2px;
 }
+
+
+/* Compact expandable product listing: name and item number until opened. */
+.product-table.product-accordion-table {
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.product-accordion-table thead th:first-child {
+  width: 150px;
+}
+
+.product-table td.product-accordion-cell {
+  padding: 0;
+}
+
+.product-accordion-toggle {
+  display: grid;
+  grid-template-columns: 134px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 49px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.product-accordion-toggle:hover,
+.product-accordion-toggle[aria-expanded="true"] {
+  background: #fbf3e7;
+}
+
+.product-accordion-toggle:focus-visible {
+  outline: 3px solid var(--brown);
+  outline-offset: -3px;
+}
+
+.product-accordion-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .82rem;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.product-accordion-name {
+  font-size: .91rem;
+  font-weight: 650;
+  line-height: 1.4;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.product-accordion-chevron {
+  justify-self: end;
+  font-size: 1.55rem;
+  line-height: 1;
+  color: var(--brown);
+  transition: transform 150ms ease;
+}
+
+.product-accordion-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.product-accordion-details {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 26px;
+  align-items: center;
+  padding: 18px 24px 22px 166px;
+  background: #fffaf3;
+  border-top: 1px solid #eee6dc;
+}
+
+.product-accordion-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 160px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.product-accordion-image img {
+  display: block;
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+}
+
+.product-accordion-image > span {
+  padding: 16px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: .8rem;
+  line-height: 1.5;
+}
+
+.product-accordion-information {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 18px 30px;
+}
+
+.product-accordion-category {
+  flex: 0 0 100%;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: .82rem;
+}
+
+.product-accordion-price {
+  display: grid;
+  gap: 5px;
+}
+
+.product-accordion-price > span,
+.product-accordion-order > label {
+  display: block;
+  color: var(--ink-soft);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.product-accordion-price > strong {
+  color: var(--brown);
+  font-size: 1.18rem;
+}
+
+.product-accordion-order {
+  display: grid;
+  gap: 7px;
+}
+
+.product-accordion-order .catalog-quantity-control input {
+  width: 78px;
+}
+
+.product-accordion-order .catalog-quantity-control button {
+  min-width: 64px;
+}
+
+.product-accordion-signin {
+  margin: 0;
+  max-width: 520px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  font-size: .9rem;
+}
+
+.product-accordion-signin a {
+  color: var(--brown);
+  font-weight: 800;
+}
+
+@media (max-width: 750px) {
+  .product-accordion-table thead th:first-child {
+    width: 110px;
+  }
+
+  .product-accordion-toggle {
+    grid-template-columns: 94px minmax(0, 1fr) 20px;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .product-accordion-details {
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 18px;
+    padding: 18px 14px;
+  }
+
+  .product-accordion-image {
+    width: 112px;
+    height: 112px;
+  }
+
+  .product-accordion-image img {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-accordion-id {
+    font-size: .72rem;
+  }
+
+  .product-accordion-name {
+    font-size: .86rem;
+  }
+
+  .product-accordion-details {
+    grid-template-columns: 1fr;
+  }
+
+  .product-accordion-image {
+    width: 132px;
+    height: 132px;
+  }
+
+  .product-accordion-image img {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-accordion-chevron {
+    transition: none;
+  }
+}
