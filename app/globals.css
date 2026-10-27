@@ -836,6 +836,68 @@ h2 {
   padding-bottom: 12px;
 }
 
+/* Category landing pages share the compact Products header and controls. */
+.category-page-hero .category-breadcrumb {
+  margin-bottom: 10px;
+  font-size: .8rem;
+  line-height: 1.4;
+}
+
+.category-page-hero .category-breadcrumb a {
+  text-underline-offset: 3px;
+}
+
+.category-result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+}
+
+.category-result-toolbar .back-to-categories {
+  margin-bottom: 0;
+  font-size: .84rem;
+  text-decoration: none;
+}
+
+.category-result-toolbar .back-to-categories:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.category-result-toolbar > span {
+  color: var(--ink-soft);
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.category-ordering {
+  padding: 30px 0 65px;
+}
+
+.category-intro-after-catalog {
+  max-width: 850px;
+  margin-bottom: 30px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+
+@media (max-width: 620px) {
+  .category-page-hero .category-breadcrumb {
+    margin-bottom: 8px;
+  }
+
+  .category-result-toolbar {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .category-ordering {
+    padding-top: 20px;
+  }
+}
+
 .catalog-category-guides {
   padding: 0 0 64px;
 }
