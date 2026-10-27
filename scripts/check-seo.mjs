@@ -160,6 +160,16 @@ try {
 
     const category = categories.find(([slug]) => path === `/products/${slug}`);
     if (category) {
+      // Category landing pages open directly into the products, not a second
+      // oversized category heading or the long SEO introduction.
+      assert.match(html, /class="page-hero product-page-hero category-page-hero"/, path);
+      assert.match(html, /class="category-result-toolbar"/, path);
+      assert.doesNotMatch(html, /class="category-view-description"/, path);
+      const tablePosition = html.indexOf('class="product-table"');
+      const guidePosition = html.indexOf('class="category-landing-links"');
+      const introPosition = html.indexOf('class="category-intro-after-catalog"');
+      assert.ok(tablePosition >= 0 && guidePosition > tablePosition, `Category links must be below products: ${path}`);
+      assert.ok(introPosition > tablePosition, `Long category introduction must follow products: ${path}`);
       const breadcrumbScripts = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
       assert.equal(breadcrumbScripts.length, 1, `Expected one breadcrumb JSON-LD script on ${path}`);
       const breadcrumb = JSON.parse(breadcrumbScripts[0][1]);
