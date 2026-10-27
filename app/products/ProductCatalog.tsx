@@ -79,71 +79,115 @@ function ProductTable({
   onQuantityChange: (productId: string, quantity: number) => void;
   onSave: (productId: string) => void;
 }) {
+  // Only mount details (including images) for the open item. This keeps large
+  // category and search listings light while allowing keyboard navigation.
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   return (
     <div className="product-table-wrap">
-      <table className="product-table">
+      <table className="product-table product-accordion-table">
         <thead>
           <tr>
-            <th>Item #</th>
-            <th>Product</th>
-            {showCategory && <th>Category</th>}
-            {showPrices && <th className="price-column">Price</th>}
-            {orderEnabled && <th className="order-column">Order qty</th>}
+            <th scope="col">Item #</th>
+            <th scope="col">Product</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((product) => (
-            <tr key={product.id}>
-              <td className="item-id">{product.id}</td>
-              <td className="product-name-cell">
-                <div className="catalog-product-with-image">
-                  {product.imageUrl && <img src={product.imageUrl} alt={product.name} width={64} height={64} loading="lazy" />}
-                  <span>{product.name}</span>
-                </div>
-              </td>
-              {showCategory && <td>{product.category}</td>}
-              {showPrices && (
-                <td className="price-column">
-                  {prices?.[product.id] !== undefined
-                    ? money.format(prices[product.id])
-                    : prices ? "—" : "Loading…"}
-                </td>
-              )}
-              {orderEnabled && (
-                <td className="order-column">
-                  <div className="catalog-quantity-control">
-                    <input
-                      type="number"
-                      min={0}
-                      max={9999}
-                      step={1}
-                      aria-label={"Quantity for " + product.name}
-                      value={quantities[product.id] ?? 0}
-                      onChange={(event) =>
-                        onQuantityChange(
-                          product.id,
-                          Math.max(
-                            0,
-                            Math.min(
-                              9999,
-                              Math.trunc(Number(event.target.value) || 0)
-                            )
-                          )
-                        )
-                      }
-                    />
-                    <button
-                      type="button"
-                      onClick={() => onSave(product.id)}
-                      disabled={savingProduct === product.id}
+          {items.map((product) => {
+            const expanded = expandedId === product.id;
+            const toggleId = "product-toggle-" + product.id;
+            const detailsId = "product-details-" + product.id;
+
+            return (
+              <tr key={product.id}>
+                <td colSpan={2} className="product-accordion-cell">
+                  <button
+                    id={toggleId}
+                    type="button"
+                    className="product-accordion-toggle"
+                    aria-expanded={expanded}
+                    aria-controls={expanded ? detailsId : undefined}
+                    onClick={() => setExpandedId(expanded ? null : product.id)}
+                  >
+                    <span className="product-accordion-id">{product.id}</span>
+                    <span className="product-accordion-name">{product.name}</span>
+                    <span className={"product-accordion-chevron" + (expanded ? " is-open" : "")} aria-hidden="true">⌄</span>
+                  </button>
+
+                  {expanded && (
+                    <div
+                      id={detailsId}
+                      role="region"
+                      aria-labelledby={toggleId}
+                      className="product-accordion-details"
                     >
-                      {savingProduct === product.id ? "Working…" : "Add"}
-                    </button>
-                  </div>
+                      <div className="product-accordion-image">
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            width={140}
+                            height={140}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span>No image available</span>
+                        )}
+                      </div>
+                      <div className="product-accordion-information">
+                        {showCategory && (
+                          <p className="product-accordion-category">{product.category}</p>
+                        )}
+                        {showPrices ? (
+                          <div className="product-accordion-price">
+                            <span>Wholesale price</span>
+                            <strong>
+                              {prices?.[product.id] !== undefined
+                                ? money.format(prices[product.id])
+                                : prices ? "Price unavailable" : "Loading…"}
+                            </strong>
+                          </div>
+                        ) : (
+                          <p className="product-accordion-signin">
+                            Wholesale pricing and ordering are available to approved customers.{" "}
+                            <Link href="/login">Sign in</Link>
+                          </p>
+                        )}
+                        {orderEnabled && (
+                          <div className="product-accordion-order">
+                            <label htmlFor={"product-qty-" + product.id}>Quantity</label>
+                            <div className="catalog-quantity-control">
+                              <input
+                                id={"product-qty-" + product.id}
+                                type="number"
+                                min={0}
+                                max={9999}
+                                step={1}
+                                value={quantities[product.id] ?? 0}
+                                onChange={(event) =>
+                                  onQuantityChange(
+                                    product.id,
+                                    Math.max(0, Math.min(9999, Math.trunc(Number(event.target.value) || 0)))
+                                  )
+                                }
+                              />
+                              <button
+                                type="button"
+                                onClick={() => onSave(product.id)}
+                                disabled={savingProduct === product.id}
+                              >
+                                {savingProduct === product.id ? "Working…" : "Add"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </td>
-              )}
-            </tr>
-          ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -335,7 +379,7 @@ export default function ProductCatalog({
               <div>
                 <strong>Ordering as {user.businessName || user.email}</strong>
                 <span>
-                  View wholesale prices, enter a quantity beside any product and press Add.
+                  Expand a product to see its image and wholesale price, then choose a quantity and press Add.
                   Use 0 to remove an item.
                 </span>
               </div>
