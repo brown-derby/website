@@ -188,7 +188,7 @@ try {
       // number and name until the customer activates its accessible toggle.
       assert.equal((tbody.match(/class="product-accordion-toggle"/g) || []).length, expected.length, path);
       assert.equal((tbody.match(/aria-expanded="false"/g) || []).length, expected.length, path);
-      assert.doesNotMatch(tbody, /<img\\b|<input\\b|product-accordion-details/, path);
+      assert.doesNotMatch(tbody, /<img\b|<input\b|product-accordion-details/, path);
       assert.match(tbody, new RegExp(expected[0].id));
     }
   }
