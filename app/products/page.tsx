@@ -14,23 +14,25 @@ export default function ProductsPage() {
     <>
       <section className="page-hero product-page-hero">
         <div className="shell">
-          <p className="eyebrow">Products</p>
-          <h1>Browse the Brown Derby catalog.</h1>
+          <h1>Wholesale products</h1>
           <p>
-            Search by product name or item number, or browse our catalog by category.
-            Brown Derby supplies wholesale food, beverages, confectionery, packaging,
-            cleaning products and restaurant supplies from Grand Falls-Windsor,
-            Newfoundland. Sign in with an approved account to see wholesale pricing and place an order.
+            Search by product name or item number, or browse by category.
+            Sign in to see wholesale prices and add products to your order.
           </p>
-          <nav aria-label="Wholesale category guides">
-            <CategoryLinks />
-          </nav>
         </div>
       </section>
 
       <section className="catalog-shell">
         <div className="shell">
           <ProductCatalog products={getPublicCatalogProducts()} />
+        </div>
+      </section>
+      <section className="catalog-category-guides">
+        <div className="shell">
+          <h2>Explore wholesale categories</h2>
+          <nav aria-label="Wholesale category guides">
+            <CategoryLinks />
+          </nav>
         </div>
       </section>
     </>
