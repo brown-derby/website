@@ -379,20 +379,31 @@ export default function ProductCatalog({
         </section>
       ) : selectedCategory ? (
         <section className="catalog-list-view">
-          <button className="back-to-categories" type="button" onClick={showCategories}>
-            ← All categories
-          </button>
-
-          <div className="catalog-view-heading">
-            <div>
-              <p className="eyebrow">Product category</p>
-              <h2>{selectedCategory}</h2>
-              <p className="category-view-description">
-                {categoryDescriptions[selectedCategory]}
-              </p>
+          {initialCategory === selectedCategory ? (
+            <div className="category-result-toolbar">
+              <Link href="/products" className="back-to-categories">
+                ← All categories
+              </Link>
+              <span>{categoryProducts.length.toLocaleString()} items</span>
             </div>
-            <p>{categoryProducts.length.toLocaleString()} items</p>
-          </div>
+          ) : (
+            <>
+              <button className="back-to-categories" type="button" onClick={showCategories}>
+                ← All categories
+              </button>
+
+              <div className="catalog-view-heading">
+                <div>
+                  <p className="eyebrow">Product category</p>
+                  <h2>{selectedCategory}</h2>
+                  <p className="category-view-description">
+                    {categoryDescriptions[selectedCategory]}
+                  </p>
+                </div>
+                <p>{categoryProducts.length.toLocaleString()} items</p>
+              </div>
+            </>
+          )}
 
           <ProductTable items={categoryProducts} {...tableProps} />
         </section>
