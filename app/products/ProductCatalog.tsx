@@ -137,7 +137,7 @@ function ProductTable({
                       onClick={() => onSave(product.id)}
                       disabled={savingProduct === product.id}
                     >
-                      {savingProduct === product.id ? "Saving…" : "Save"}
+                      {savingProduct === product.id ? "Working…" : "Add"}
                     </button>
                   </div>
                 </td>
@@ -335,7 +335,7 @@ export default function ProductCatalog({
               <div>
                 <strong>Ordering as {user.businessName || user.email}</strong>
                 <span>
-                  View wholesale prices, enter a quantity beside any product and press Save.
+                  View wholesale prices, enter a quantity beside any product and press Add.
                   Use 0 to remove an item.
                 </span>
               </div>
