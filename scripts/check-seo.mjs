@@ -165,7 +165,7 @@ try {
       assert.match(html, /class="page-hero product-page-hero category-page-hero"/, path);
       assert.match(html, /class="category-result-toolbar"/, path);
       assert.doesNotMatch(html, /class="category-view-description"/, path);
-      const tablePosition = html.indexOf('class="product-table"');
+      const tablePosition = html.indexOf('class="product-table product-accordion-table"');
       const guidePosition = html.indexOf('class="category-landing-links"');
       const introPosition = html.indexOf('class="category-intro-after-catalog"');
       assert.ok(tablePosition >= 0 && guidePosition > tablePosition, `Category links must be below products: ${path}`);
