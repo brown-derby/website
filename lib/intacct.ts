@@ -169,7 +169,7 @@ export function generateIntacctOrderCsv(order: ExportOrder, customer: IntacctCus
     values.TERMNAME = customer.term_name || "";
     values.DATEDUE = shortDate(dueDate);
     values.REFERENCENO = reference;
-    values.MESSAGE = (order.notes || "").trim().slice(0, 2000);
+    values.MESSAGE = (order.notes || "").trim().slice(0, 1000);
     values.STATE = "Draft";
     values.LINE = String(index + 1);
     values.ITEMID = item.product_id;
