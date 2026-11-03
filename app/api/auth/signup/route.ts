@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
   const contactName =
     typeof body?.contactName === "string" ? body.contactName.trim().slice(0, 160) : "";
 
-  if (!email || !businessName || password.length < 12) {
+  if (!email || !businessName || !password) {
     return NextResponse.json(
-      { error: "Enter a business name, valid email, and a password of at least 12 characters." },
+      { error: "Enter a business name, valid email, and a password." },
       { status: 400 }
     );
   }

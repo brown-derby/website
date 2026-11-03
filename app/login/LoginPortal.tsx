@@ -153,10 +153,8 @@ export default function LoginPortal() {
               name="password"
               type="password"
               required
-              minLength={mode === "signup" ? 12 : undefined}
               autoComplete={mode === "signin" ? "current-password" : "new-password"}
             />
-            {mode === "signup" && <small>Use at least 12 characters.</small>}
           </label>
           <button className="button button-primary portal-submit" disabled={working}>
             {working

@@ -68,12 +68,11 @@ export default function ResetPasswordClient() {
       <form className="portal-form" onSubmit={submit}>
         <label>
           <span>New password</span>
-          <input name="password" type="password" minLength={12} required autoComplete="new-password" />
-          <small>Use at least 12 characters.</small>
+          <input name="password" type="password" required autoComplete="new-password" />
         </label>
         <label>
           <span>Confirm password</span>
-          <input name="confirmPassword" type="password" minLength={12} required autoComplete="new-password" />
+          <input name="confirmPassword" type="password" required autoComplete="new-password" />
         </label>
         <button className="button button-primary portal-submit" disabled={!token || working}>
           {working ? "Updating…" : "Update password"}

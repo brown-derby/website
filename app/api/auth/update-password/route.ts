@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
     typeof body?.accessToken === "string" ? body.accessToken : "";
   const password = typeof body?.password === "string" ? body.password : "";
 
-  if (!accessToken || password.length < 12) {
+  if (!accessToken || !password) {
     return NextResponse.json(
-      { error: "Use a password of at least 12 characters." },
+      { error: "Enter a new password." },
       { status: 400 }
     );
   }
@@ -28,8 +28,18 @@ export async function POST(request: NextRequest) {
   });
 
   if (!response.ok) {
+    const details = await response.json().catch(() => null);
+    const weakPassword =
+      response.status === 422 ||
+      details?.code === "weak_password" ||
+      details?.error_code === "weak_password";
+
     return NextResponse.json(
-      { error: "This reset link is invalid or has expired." },
+      {
+        error: weakPassword
+          ? details?.message || details?.msg || "This password does not meet the account security requirements."
+          : "This reset link is invalid or has expired.",
+      },
       { status: 400 }
     );
   }
