@@ -105,15 +105,15 @@ $$;
 revoke all on function public.admin_upsert_intacct_customers(jsonb) from public, anon;
 grant execute on function public.admin_upsert_intacct_customers(jsonb) to authenticated;
 
-create or replace function private.admin_set_intacct_customer(account_id uuid, customer_id text)
+create or replace function private.admin_set_intacct_customer(account_id uuid, target_customer_id text)
 returns void language plpgsql security definer set search_path = '' as $$
 declare previous text;
 begin
   if not private.is_portal_admin() then
     raise exception 'Administrator access required' using errcode = '42501';
   end if;
-  if customer_id is not null and not exists (
-    select 1 from public.intacct_customers c where c.customer_id = customer_id
+  if target_customer_id is not null and not exists (
+    select 1 from public.intacct_customers c where c.customer_id = target_customer_id
   ) then
     raise exception 'Customer ID not found in Intacct import';
   end if;
@@ -125,14 +125,14 @@ begin
     raise exception 'Approved website account not found';
   end if;
   update public.customer_accounts set
-    intacct_customer_id = customer_id,
-    intacct_matched_at = case when customer_id is null then null else now() end,
-    intacct_matched_by = case when customer_id is null then null else auth.uid() end
+    intacct_customer_id = target_customer_id,
+    intacct_matched_at = case when target_customer_id is null then null else now() end,
+    intacct_matched_by = case when target_customer_id is null then null else auth.uid() end
   where user_id = account_id;
-  if previous is distinct from customer_id then
+  if previous is distinct from target_customer_id then
     insert into private.intacct_customer_match_audit(
       website_user_id, old_customer_id, new_customer_id, changed_by
-    ) values (account_id, previous, customer_id, auth.uid());
+    ) values (account_id, previous, target_customer_id, auth.uid());
   end if;
 end;
 $$;
