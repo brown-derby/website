@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import AccountApprovals from "./AccountApprovals";
+import IntacctAdmin from "./IntacctAdmin";
 
 type OrderItem = {
   id?: number;
@@ -307,7 +308,7 @@ export default function PortalClient() {
       <p>{approvalStatus === "unavailable" ? "Please try again shortly." : "Brown Derby must approve your account before you can see wholesale prices or place orders. You can continue browsing our products."}</p>
       <p>For help, contact <a href="mailto:csr@brownderby.ca">csr@brownderby.ca</a> or call <a href="tel:+17094892299">709-489-2299</a>.</p>
       <div className="approval-actions"><button type="button" className="button button-primary" onClick={() => loadPortal()}>Check approval status</button><Link href="/products" className="button button-secondary">Browse products</Link><button type="button" className="portal-text-button" onClick={logout}>Sign out</button></div>
-      {isAdmin && <AccountApprovals />}
+      {isAdmin && <><AccountApprovals /><IntacctAdmin /></>}
     </div>;
   }
 
@@ -326,7 +327,7 @@ export default function PortalClient() {
 
       {message && <div className="portal-message success">{message}</div>}
       {error && <div className="portal-message error">{error}</div>}
-      {isAdmin && <AccountApprovals />}
+      {isAdmin && <><AccountApprovals /><IntacctAdmin /></>}
 
       <section className="current-order-card">
         <div className="current-order-heading">

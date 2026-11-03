@@ -1,0 +1,177 @@
+.section {
+  margin-top: 28px;
+}
+.intro {
+  max-width: 790px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+.stats > div {
+  border-radius: 14px;
+  background: #f9f4ec;
+  border: 1px solid #e7d9ca;
+  padding: 16px;
+}
+.stats strong {
+  display: block;
+  font-size: 1.6rem;
+  color: #54351f;
+}
+.stats span {
+  display: block;
+  font-size: .8rem;
+  margin-top: 4px;
+}
+.panel {
+  border-top: 1px solid #e5d8c7;
+  padding: 24px 0;
+}
+.panel h3 {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+}
+.panel p {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.formRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(220px, .86fr) minmax(260px, 1.14fr);
+  gap: 18px;
+}
+.accountList,
+.matchPanel {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e4d6c6;
+  border-radius: 12px;
+  background: #fffdf9;
+}
+.accountList label,
+.matchPanel label,
+.confirm label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+.accountList input,
+.matchPanel input,
+.confirm input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #c8b7a5;
+  border-radius: 9px;
+  margin-bottom: 10px;
+  background: white;
+  color: #251e17;
+}
+.scroll {
+  max-height: 430px;
+  overflow-y: auto;
+}
+.account {
+  width: 100%;
+  display: block;
+  text-align: left;
+  background: transparent;
+  padding: 10px;
+  border: 0;
+  border-bottom: 1px solid #ece4da;
+  cursor: pointer;
+  border-radius: 7px;
+}
+.account:hover,
+.active {
+  background: #f4e9dc;
+}
+.account strong,
+.account small,
+.orderRow strong,
+.orderRow small {
+  display: block;
+}
+.account small,
+.orderRow small {
+  font-size: .76rem;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+.matchPanel h4 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 10px 0 16px;
+}
+.suggestions button {
+  font-size: .8rem;
+  background: #f6eadb;
+  border: 1px solid #ddc7b1;
+  border-radius: 8px;
+  text-align: left;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.customerSelect {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #c8b7a5;
+  border-radius: 9px;
+  background: white;
+  color: #251e17;
+  margin-bottom: 12px;
+}
+.customerSelect option {
+  padding: 5px;
+  font-size: .83rem;
+}
+.help {
+  font-size: .82rem;
+}
+.orderList {
+  display: grid;
+  gap: 9px;
+}
+.orderRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e9e0d5;
+  align-items: center;
+}
+.orderRow > div:first-child {
+  min-width: 0;
+}
+.confirm {
+  min-width: 176px;
+  max-width: 250px;
+}
+.confirm input {
+  margin: 0 0 7px;
+}
+.done {
+  font-size: .8rem;
+  font-weight: 700;
+  color: #357055;
+}
+@media (max-width: 750px) {
+  .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .grid { grid-template-columns: 1fr; }
+  .orderRow { flex-direction: column; align-items: flex-start; }
+  .confirm { width: 100%; max-width: none; }
+}
