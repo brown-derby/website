@@ -80,9 +80,12 @@ export default function IntacctAdmin() {
   }, [selectedAccount, customers]);
   const visibleCustomers = customers.filter(customer =>
     (customer.customer_id + " " + customer.customer_name + " " + (customer.email || ""))
-      .toLowerCase().includes(customerFilter.toLowerCase()) ||
-    customer.customer_id === selectedCustomer
-  ).slice(0, 80);
+      .toLowerCase().includes(customerFilter.toLowerCase())
+  ).slice(0, 79);
+  const chosen = customers.find(customer => customer.customer_id === selectedCustomer);
+  if (chosen && !visibleCustomers.some(customer => customer.customer_id === chosen.customer_id)) {
+    visibleCustomers.push(chosen);
+  }
 
   function chooseAccount(account: Account) {
     setSelectedUser(account.user_id);
