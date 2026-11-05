@@ -1,17 +1,11 @@
 import products from "../data/products.json";
-import programPrices from "../data/program-prices.json";
 import approvedImages from "../data/approved-product-images.json";
+import { databaseRequest } from "./portal";
 
 export type CatalogProduct = {
   id: string;
   name: string;
   category: string;
-  websitePrice: number;
-};
-
-type ProgramPrice = {
-  price: number;
-  toDate: string;
 };
 
 export const catalogProducts = products as CatalogProduct[];
@@ -51,28 +45,39 @@ export function getPublicCatalogProducts(): PublicCatalogProduct[] {
 }
 
 const byId = new Map(catalogProducts.map((product) => [product.id, product]));
-const programById = programPrices as Record<string, ProgramPrice>;
 
-function newfoundlandDateKey(value: Date) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/St_Johns",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(value);
+// Pricing is held in a private Supabase table, NOT in the public GitHub repo.
+// Supabase checks the signed-in user and their verified, approved account
+// before allowing this RPC to return any wholesale pricing.
+export async function getCatalogPrices(
+  accessToken: string
+): Promise<Record<string, number>> {
+  const response = await databaseRequest(
+    "rpc/catalog_prices_for_customer",
+    accessToken,
+    { method: "POST", body: "{}" }
+  );
 
-  const part = (type: "year" | "month" | "day") =>
-    parts.find((item) => item.type === type)?.value || "";
+  if (!response.ok) {
+    throw new Error("Unable to load authorized catalogue pricing.");
+  }
 
-  return `${part("year")}-${part("month")}-${part("day")}`;
+  const result: unknown = await response.json();
+  if (!result || typeof result !== "object" || Array.isArray(result)) {
+    throw new Error("Catalogue pricing response was invalid.");
+  }
+  return result as Record<string, number>;
 }
 
-export function getCatalogPrice(product: CatalogProduct, at = new Date()) {
-  const program = programById[product.id];
-  if (program && newfoundlandDateKey(at) <= program.toDate) {
-    return program.price;
+export function getCatalogPrice(
+  product: CatalogProduct,
+  prices: Record<string, number>
+): number {
+  const price = prices[product.id];
+  if (typeof price !== "number" || !Number.isFinite(price) || price <= 0) {
+    throw new Error("No valid price for " + product.id);
   }
-  return product.websitePrice;
+  return price;
 }
 
 export function getCatalogProduct(id: string) {

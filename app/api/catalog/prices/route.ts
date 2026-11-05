@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { catalogProducts, getCatalogPrice } from "../../../../lib/catalog";
+import { getCatalogPrices } from "../../../../lib/catalog";
 import { getSession, pricingDenied } from "../../../../lib/portal";
 
 // Customer pricing must never be cached by shared proxies.
@@ -24,9 +24,7 @@ export async function GET() {
         status: session.approvalStatus === "unavailable" ? 503 : 403, headers: privateHeaders,
       });
     }
-    const prices = Object.fromEntries(
-      catalogProducts.map((product) => [product.id, getCatalogPrice(product)])
-    );
+    const prices = await getCatalogPrices(session.accessToken);
     return NextResponse.json({ prices }, { headers: privateHeaders });
   } catch {
     return NextResponse.json(
