@@ -1,4 +1,4 @@
-import { getCatalogPrice, getCatalogProduct } from "./catalog";
+import { getCatalogPrice, getCatalogPrices, getCatalogProduct } from "./catalog";
 import {
   customerSnapshot,
   databaseRequest,
@@ -43,15 +43,16 @@ async function jsonOrThrow<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-function withCurrentDraftPrices(order: CustomerOrder) {
+function withCurrentDraftPrices(order: CustomerOrder, prices: Record<string, number>) {
   if (order.status !== "draft" || !order.order_items?.length) return order;
 
   return {
     ...order,
     order_items: order.order_items.map((item) => {
       const product = getCatalogProduct(item.product_id);
-      return product
-        ? { ...item, unit_price: getCatalogPrice(product) }
+      const currentPrice = prices[item.product_id];
+      return product && typeof currentPrice === "number" && currentPrice > 0
+        ? { ...item, unit_price: currentPrice }
         : item;
     }),
   };
@@ -67,7 +68,8 @@ export async function getOrdersForUser(userId: string, accessToken: string) {
     accessToken
   );
   const orders = await jsonOrThrow<CustomerOrder[]>(response);
-  return orders.map(withCurrentDraftPrices);
+  const prices = await getCatalogPrices(accessToken);
+  return orders.map((order) => withCurrentDraftPrices(order, prices));
 }
 
 export async function getDraftForUser(userId: string, accessToken: string) {
@@ -80,7 +82,7 @@ export async function getDraftForUser(userId: string, accessToken: string) {
     accessToken
   );
   const rows = await jsonOrThrow<CustomerOrder[]>(response);
-  return rows[0] ? withCurrentDraftPrices(rows[0]) : null;
+  return rows[0] ? withCurrentDraftPrices(rows[0], await getCatalogPrices(accessToken)) : null;
 }
 
 export async function getOrderForUser(userId: string, orderId: string, accessToken: string) {
@@ -95,7 +97,7 @@ export async function getOrderForUser(userId: string, orderId: string, accessTok
     accessToken
   );
   const rows = await jsonOrThrow<CustomerOrder[]>(response);
-  return rows[0] ? withCurrentDraftPrices(rows[0]) : null;
+  return rows[0] ? withCurrentDraftPrices(rows[0], await getCatalogPrices(accessToken)) : null;
 }
 
 export async function ensureDraft(user: PortalUser, accessToken: string) {
@@ -145,6 +147,7 @@ export async function setDraftItem(
     return getDraftForUser(user.id, accessToken);
   }
 
+  const prices = await getCatalogPrices(accessToken);
   const response = await databaseRequest(
     "order_items?on_conflict=order_id,product_id",
     accessToken,
@@ -156,7 +159,7 @@ export async function setDraftItem(
         product_id: product.id,
         product_name: product.name,
         category: product.category,
-        unit_price: getCatalogPrice(product),
+        unit_price: getCatalogPrice(product, prices),
         quantity,
         item_notes: draft.order_items?.find((item) => item.product_id === productId)?.item_notes || "",
       }),
@@ -177,6 +180,7 @@ export async function repriceDraftOrder(
     return order;
   }
 
+  const prices = await getCatalogPrices(accessToken);
   const items = order.order_items.map((item) => {
     const product = getCatalogProduct(item.product_id);
     return {
@@ -184,7 +188,7 @@ export async function repriceDraftOrder(
       product_id: item.product_id,
       product_name: product?.name || item.product_name,
       category: product?.category || item.category,
-      unit_price: product ? getCatalogPrice(product) : item.unit_price,
+      unit_price: product && prices[product.id] ? getCatalogPrice(product, prices) : item.unit_price,
       quantity: item.quantity,
       item_notes: item.item_notes || "",
     };
