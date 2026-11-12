@@ -41,6 +41,15 @@ Security design:
 
 After Supabase is connected, run supabase/schema.sql in its SQL editor.
 
+Password recovery: Supabase allows using a password that was used previously,
+provided it is not also the current password. For a valid recovery token that
+submits the current password, the website now treats Supabase's `same_password`
+response as a no-op confirmation. The password stays unchanged and the customer
+is told they may sign in using it. Weak passwords, missing tokens, and expired
+or invalid recovery tokens still fail. Verify with
+`node scripts/check-password-reuse.mjs` after `npm run build`.
+
+
 
 ## Account approval
 
