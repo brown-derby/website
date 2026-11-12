@@ -28,6 +28,9 @@ jobs:
       - name: Type check
         run: npm run check
 
+      - name: Validate account approval email
+        run: npm run check:approval-email
+
       - name: Validate approved image bindings and bytes
         run: npm run check:images
 
