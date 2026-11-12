@@ -29,6 +29,15 @@ export async function POST(request: NextRequest) {
 
   if (!response.ok) {
     const details = await response.json().catch(() => null);
+
+    // Supabase rejects a password identical to the current one. A successful
+    // recovery-token verification followed by "same_password" means there is
+    // nothing to update: let the customer keep their existing password.
+    // Never treat invalid/expired recovery tokens or weak passwords as success.
+    if (details?.code === "same_password" || details?.error_code === "same_password") {
+      return NextResponse.json({ ok: true, unchanged: true });
+    }
+
     const weakPassword =
       response.status === 422 ||
       details?.code === "weak_password" ||

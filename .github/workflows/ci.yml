@@ -40,5 +40,8 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify password recovery and reuse
+        run: node scripts/check-password-reuse.mjs
+
       - name: Verify rendered SEO
         run: npm run check:seo

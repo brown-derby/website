@@ -6,6 +6,7 @@ export default function ResetPasswordClient() {
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [unchanged, setUnchanged] = useState(false);
   const [working, setWorking] = useState(false);
 
   useEffect(() => {
@@ -43,14 +44,19 @@ export default function ResetPasswordClient() {
       return;
     }
 
+    setUnchanged(data.unchanged === true);
     setDone(true);
   }
 
   if (done) {
     return (
       <div className="login-card">
-        <h2>Password updated.</h2>
-        <p>You can now sign in with your new password.</p>
+        <h2>{unchanged ? "Password kept." : "Password updated."}</h2>
+        <p>
+          {unchanged
+            ? "This was already your current password, so no change was needed. You can sign in using it."
+            : "You can now sign in with your new password."}
+        </p>
         <a className="button button-primary" href="/login">Go to sign in</a>
       </div>
     );
