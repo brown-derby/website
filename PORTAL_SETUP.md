@@ -58,7 +58,21 @@ account page picks up an approval immediately without signing out.
 
 The review operation records administrator, decision, and timestamp in the private
 audit table. Customers cannot update approval records or promote themselves.
-No service-role key is used. No approval emails are sent automatically.
+No service-role key is used.
+
+Approving a pending or declined customer automatically sends a branded account-ready
+email from `ORDER_EMAIL_FROM` through Resend, with a direct link to
+`https://brownderby.ca/login`. It reminds the customer that email confirmation
+is also required. Approving an already-approved customer does not resend the
+message; admins can choose **Approved → Resend approval email** when needed.
+
+If Resend is unconfigured or rejects the notification, the approval still
+succeeds immediately. The admin screen reports that the email was not sent
+and offers the resend option. Existing `RESEND_API_KEY` and `ORDER_EMAIL_FROM`
+server-side Vercel variables are used, so no additional credentials are needed.
+
+Run `npm run check:approval-email` to test the email template, escaping, and
+Resend request handling with mock responses (no external emails are sent).
 
 Validation: `npm run check`, `npm run build`, and
 `node scripts/check-account-approval.mjs`. The integration check uses a local
