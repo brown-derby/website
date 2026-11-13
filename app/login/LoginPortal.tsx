@@ -187,15 +187,6 @@ export default function LoginPortal() {
           </form>
         )}
       </div>
-
-      <aside className="login-security-note">
-        <strong>Secure customer access</strong>
-        <p>
-          Passwords are handled by a dedicated authentication service. Brown Derby
-          does not store readable customer passwords, and portal sessions use secure,
-          HttpOnly browser cookies.
-        </p>
-      </aside>
     </div>
   );
 }

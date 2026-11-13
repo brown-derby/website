@@ -1239,13 +1239,11 @@ h2 {
 
 .login-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
-  align-items: start;
 }
 
 .login-mode-switch {
-  grid-column: 1 / -1;
   display: inline-flex;
   width: fit-content;
   padding: 4px;
@@ -1387,28 +1385,6 @@ h2 {
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid var(--line);
-}
-
-.login-security-note {
-  padding: 27px;
-  border-radius: 20px;
-  color: var(--cream);
-  background: var(--brown-dark);
-}
-
-.login-security-note strong {
-  display: block;
-  margin-bottom: 10px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.25rem;
-  font-weight: 500;
-}
-
-.login-security-note p {
-  margin: 0;
-  color: #d8c6b7;
-  font-size: .9rem;
-  line-height: 1.7;
 }
 
 .portal-message {
@@ -1795,14 +1771,6 @@ h2 {
 }
 
 @media (max-width: 900px) {
-  .login-panel {
-    grid-template-columns: 1fr;
-  }
-
-  .login-mode-switch {
-    grid-column: auto;
-  }
-
   .order-notes-total {
     grid-template-columns: 1fr;
   }
