@@ -21,6 +21,8 @@ type ExportAudit = {
   exported_at: string;
   imported_at: string | null;
   intacct_document_no: string | null;
+  ship_date: string | null;
+  legacy_reviewed_at: string | null;
 };
 
 type Data = {
@@ -34,6 +36,11 @@ function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+const legacyCutoff = Date.parse("2026-11-23T03:30:00Z"); // midnight in Newfoundland
+const todayNewfoundland = () => new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/St_Johns", year: "numeric", month: "2-digit", day: "2-digit",
+}).format(new Date());
+
 export default function IntacctAdmin() {
   const [data, setData] = useState<Data | null>(null);
   const [working, setWorking] = useState("");
@@ -45,6 +52,8 @@ export default function IntacctAdmin() {
   const [customerFilter, setCustomerFilter] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [documentNos, setDocumentNos] = useState<Record<string, string>>({});
+  const [shipDates, setShipDates] = useState<Record<string, string>>({});
+  const [legacyConfirmations, setLegacyConfirmations] = useState<Record<string, boolean>>({});
 
   async function refresh() {
     const res = await fetch("/api/admin/intacct", { cache: "no-store" });
@@ -135,10 +144,16 @@ export default function IntacctAdmin() {
     } finally { setWorking(""); }
   }
 
-  async function exportOrder(orderId: string) {
+  async function exportOrder(orderId: string, redownload = false) {
     setWorking(orderId); setError(""); setNotice("");
     try {
-      const response = await post({ action: "exportOrder", orderId });
+      const response = await post(redownload
+        ? { action: "redownloadOrder", orderId }
+        : {
+            action: "exportOrder", orderId,
+            shipDate: shipDates[orderId] || todayNewfoundland(),
+            reviewedLegacy: legacyConfirmations[orderId] === true,
+          });
       if (!(response instanceof Response)) throw new Error("CSV download was not returned.");
       const csv = await response.blob();
       const url = URL.createObjectURL(csv);
@@ -149,7 +164,9 @@ export default function IntacctAdmin() {
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setNotice("Order export generated. Import it into Intacct and record the resulting Sales Order number below.");
+      setNotice(redownload
+        ? "The original CSV was downloaded again. Check Sage before importing so you do not duplicate this order."
+        : "Order CSV prepared. Import it into Sage Intacct as a Draft, then record the verified Sales Order number.");
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to export the order.");
@@ -283,7 +300,7 @@ export default function IntacctAdmin() {
 
           <div className={styles.panel}>
             <h3>Website Sales Orders waiting for Intacct</h3>
-            <p>Existing orders may already have been entered manually. Verify each order in Intacct before downloading a CSV. An export is recorded to prevent duplicate downloads.</p>
+            <p>Import each CSV as a Draft Sales Order only. Orders submitted before November 23, 2026 require checking Sage for an existing order before export. Each exported CSV is frozen for safe re-downloads; do not import it twice.</p>
             {orders.length === 0 ? <p>No submitted orders yet.</p> : (
               <div className={styles.orderList}>
                 {orders.map(order => {
@@ -292,6 +309,8 @@ export default function IntacctAdmin() {
                   const audit = exports.find(record => record.order_id === order.id);
                   const ready = account?.status === "approved" &&
                     Boolean(customer && /^NET[0-9]{1,3}$/i.test(customer.term_name || ""));
+                  const legacy = Boolean(order.submitted_at && Date.parse(order.submitted_at) < legacyCutoff);
+                  const legacyConfirmed = legacyConfirmations[order.id] === true;
                   return (
                     <article key={order.id} className={styles.orderRow}>
                       <div>
@@ -305,13 +324,34 @@ export default function IntacctAdmin() {
                           ready ? "Ready for controlled export" : "Match customer and verify terms first"}</small>
                       </div>
                       {!audit ? (
-                        <button type="button" className="button button-secondary"
-                          disabled={!ready || Boolean(working)} onClick={() => void exportOrder(order.id)}>
-                          {working === order.id ? "Exporting…" : "Download Intacct CSV"}
-                        </button>
+                        <div className={styles.confirm}>
+                          <label htmlFor={"intacct-ship-" + order.id}>Due/Ship date (not payment due date)</label>
+                          <input id={"intacct-ship-" + order.id} type="date"
+                            value={shipDates[order.id] || todayNewfoundland()}
+                            onChange={event => setShipDates(current => ({ ...current, [order.id]: event.target.value }))} />
+                          {legacy && (
+                            <label className={styles.help}>
+                              <input type="checkbox" checked={legacyConfirmed}
+                                onChange={event => setLegacyConfirmations(current => ({
+                                  ...current, [order.id]: event.target.checked
+                                }))} />
+                              I checked Sage and confirmed this older website order has not been entered already.
+                            </label>
+                          )}
+                          <button type="button" className="button button-secondary"
+                            disabled={!ready || Boolean(working) || (legacy && !legacyConfirmed)}
+                            onClick={() => void exportOrder(order.id)}>
+                            {working === order.id ? "Exporting…" : "Download Intacct CSV"}
+                          </button>
+                        </div>
                       ) : !audit.imported_at ? (
                         <div className={styles.confirm}>
-                          <label htmlFor={"intacct-doc-" + order.id}>Intacct Sales Order #</label>
+                          <small>Frozen Due/Ship date: {audit.ship_date || "Original export"}</small>
+                          <button type="button" className="button button-secondary"
+                            disabled={Boolean(working)} onClick={() => void exportOrder(order.id, true)}>
+                            Download same CSV again
+                          </button>
+                          <label htmlFor={"intacct-doc-" + order.id}>Verified Intacct Sales Order #</label>
                           <input id={"intacct-doc-" + order.id} placeholder="e.g. SO0268"
                             value={documentNos[order.id] || ""}
                             onChange={event => setDocumentNos(current => ({ ...current, [order.id]: event.target.value }))} />
