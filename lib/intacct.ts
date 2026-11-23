@@ -149,7 +149,7 @@ export function generateIntacctOrderCsv(order: ExportOrder, customer: IntacctCus
 
   // Sage labels DATEDUE as "Due Date/Ship Date" for Order Entry.
   // Payment terms belong in TERMNAME, not in the shipping date calculation.
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(requestedShipDate)) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedShipDate)) {
     throw new Error("Choose a Due/Ship date in YYYY-MM-DD format.");
   }
   const dueDate = new Date(requestedShipDate + "T00:00:00Z");
