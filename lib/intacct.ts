@@ -136,7 +136,7 @@ function safeCsvCell(raw: string) {
   return '"' + value.replace(/"/g, '""') + '"';
 }
 
-export function generateIntacctOrderCsv(order: ExportOrder, customer: IntacctCustomer) {
+export function generateIntacctOrderCsv(order: ExportOrder, customer: IntacctCustomer, requestedShipDate: string) {
   if (order.status !== "submitted" || !order.submitted_at) {
     throw new Error("Only submitted orders can be exported.");
   }
@@ -145,12 +145,20 @@ export function generateIntacctOrderCsv(order: ExportOrder, customer: IntacctCus
   }
   const match = /^NET([0-9]{1,3})$/i.exec(customer.term_name || "");
   if (!match) throw new Error("Review this customer's payment terms before export.");
-  const termDays = Number(match[1]);
-  if (termDays > 365) throw new Error("Unusually long terms require manual review.");
+  if (Number(match[1]) > 365) throw new Error("Unusually long terms require manual review.");
 
+  // Sage labels DATEDUE as "Due Date/Ship Date" for Order Entry.
+  // Payment terms belong in TERMNAME, not in the shipping date calculation.
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(requestedShipDate)) {
+    throw new Error("Choose a Due/Ship date in YYYY-MM-DD format.");
+  }
+  const dueDate = new Date(requestedShipDate + "T00:00:00Z");
+  if (!Number.isFinite(dueDate.getTime()) ||
+      dueDate.toISOString().slice(0, 10) !== requestedShipDate) {
+    throw new Error("Due/Ship date is invalid.");
+  }
   const submitted = dateInNewfoundland(order.submitted_at);
   const transactionDate = new Date(Date.UTC(submitted.year, submitted.month - 1, submitted.day));
-  const dueDate = new Date(transactionDate.getTime() + termDays * 86_400_000);
   const reference = orderReference(order.id);
 
   const header = INTACCT_ORDER_ENTRY_HEADERS.join(",");
@@ -167,7 +175,7 @@ export function generateIntacctOrderCsv(order: ExportOrder, customer: IntacctCus
     values.DOCUMENTNO = ""; // Intacct's configured Sales Order numbering sequence
     values.CUSTOMER_ID = customer.customer_id;
     values.TERMNAME = customer.term_name || "";
-    values.DATEDUE = shortDate(dueDate);
+    values.DATEDUE = shortDate(dueDate); // Explicit shipping date chosen by an administrator
     values.REFERENCENO = reference;
     values.MESSAGE = (order.notes || "").trim().slice(0, 1000);
     values.STATE = "Draft";
