@@ -31,6 +31,9 @@ jobs:
       - name: Validate account approval email
         run: npm run check:approval-email
 
+      - name: Validate Sage Intacct CSV generation
+        run: npm run check:intacct
+
       - name: Validate approved image bindings and bytes
         run: npm run check:images
 

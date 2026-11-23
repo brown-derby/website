@@ -26,6 +26,12 @@ async function rpc(path: string, token: string, data: Record<string, unknown>) {
     if (/23505|duplicate key/i.test(detail)) {
       throw new Error("This order has already been exported. Check Intacct before trying again.");
     }
+    if (/Older orders require explicit Sage duplicate review/i.test(detail)) {
+      throw new Error("Confirm you checked for this older order in Sage before exporting.");
+    }
+    if (/valid due\/ship date/i.test(detail)) {
+      throw new Error("Choose a Due/Ship date within one year of today.");
+    }
     throw new Error("Unable to save the change. Please check the data and try again.");
   }
   return response;
@@ -44,7 +50,7 @@ export async function GET() {
       readRows("customer_accounts?select=user_id,email,business_name,contact_name,status,intacct_customer_id&order=business_name.asc&limit=2000", token),
       readRows<IntacctCustomer>("intacct_customers?select=customer_id,customer_name,term_name,email,secondary_email,city,province,postal_code&order=customer_name.asc&limit=5000", token),
       readRows<ExportOrder>("orders?select=id,user_id,status,submitted_at,notes,customer_business_name,order_items(product_id,product_name,quantity,unit_price,item_notes)&status=eq.submitted&order=submitted_at.desc&limit=300", token),
-      readRows("intacct_order_exports?select=order_id,customer_id,reference_no,exported_at,imported_at,intacct_document_no&limit=1000", token),
+      readRows("intacct_order_exports?select=order_id,customer_id,reference_no,exported_at,imported_at,intacct_document_no,ship_date,legacy_reviewed_at&limit=1000", token),
     ]);
     return NextResponse.json({ accounts, customers, orders, exports }, { headers: privateHeaders });
   } catch {
@@ -106,6 +112,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true }, { headers: privateHeaders });
     }
 
+    if (body.action === "redownloadOrder") {
+      if (typeof body.orderId !== "string" || !/^[0-9a-f-]{36}$/i.test(body.orderId)) {
+        throw new Error("Choose a valid website order.");
+      }
+      const snapshots = await readRows<{ csv_content: string | null; imported_at: string | null }>(
+        "intacct_order_exports?select=csv_content,imported_at&order_id=eq." +
+          encodeURIComponent(body.orderId) + "&limit=1", token
+      );
+      const snapshot = snapshots[0];
+      if (!snapshot || !snapshot.csv_content || snapshot.imported_at) {
+        throw new Error("No pending CSV snapshot exists for this order.");
+      }
+      // Never regenerate a reserved CSV: customer mapping, terms and prices might have changed.
+      return new NextResponse(snapshot.csv_content, {
+        status: 200,
+        headers: {
+          ...privateHeaders,
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": "attachment; filename=BrownDerby-WebOrder-" +
+            body.orderId.slice(0, 8) + ".csv",
+        },
+      });
+    }
+
     if (body.action === "exportOrder") {
       if (typeof body.orderId !== "string" || !/^[0-9a-f-]{36}$/i.test(body.orderId)) {
         throw new Error("Choose a valid website order.");
@@ -129,9 +159,15 @@ export async function POST(request: NextRequest) {
           encodeURIComponent(account.intacct_customer_id) + "&limit=1", token
       );
       if (!customerRows[0]) throw new Error("Matched Intacct customer is missing.");
-      // Validate and build before reserving. Only one download per order is allowed.
-      const csv = generateIntacctOrderCsv(order, customerRows[0]);
-      await rpc("admin_reserve_intacct_export", token, { target_order_id: order.id });
+      // The administrator chooses the shipping date. Payment terms are separate.
+      const csv = generateIntacctOrderCsv(order, customerRows[0], body.shipDate);
+      // Atomic reservation freezes the exact bytes; a failed download is safely retried.
+      await rpc("admin_reserve_intacct_export_v2", token, {
+        target_order_id: order.id,
+        requested_ship_date: body.shipDate,
+        csv_data: csv,
+        legacy_reviewed: body.reviewedLegacy === true,
+      });
       return new NextResponse(csv, {
         status: 200,
         headers: {

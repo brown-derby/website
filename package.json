@@ -10,7 +10,8 @@
     "check": "tsc --noEmit",
     "check:approval-email": "node --experimental-strip-types scripts/check-approval-email.mjs",
     "check:seo": "node scripts/check-seo.mjs",
-    "check:images": "node scripts/check-product-images.mjs"
+    "check:images": "node scripts/check-product-images.mjs",
+    "check:intacct": "node scripts/check-intacct-export.mjs"
   },
   "dependencies": {
     "next": "^16.2.4",
