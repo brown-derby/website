@@ -164,6 +164,11 @@
 .confirm input {
   margin: 0 0 7px;
 }
+.confirm input[type="checkbox"] {
+  width: auto;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+}
 .done {
   font-size: .8rem;
   font-weight: 700;
