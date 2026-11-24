@@ -170,15 +170,19 @@ export function generateIntacctOrderCsv(order: ExportOrder, customer: IntacctCus
     }
     const values: Record<string, string> = {};
     for (const field of INTACCT_ORDER_ENTRY_HEADERS) values[field] = "";
-    values.TRANSACTIONTYPE = "Sales Order";
-    values.DATE = shortDate(transactionDate);
-    values.DOCUMENTNO = ""; // Intacct's configured Sales Order numbering sequence
-    values.CUSTOMER_ID = customer.customer_id;
-    values.TERMNAME = customer.term_name || "";
-    values.DATEDUE = shortDate(dueDate); // Explicit shipping date chosen by an administrator
-    values.REFERENCENO = reference;
-    values.MESSAGE = (order.notes || "").trim().slice(0, 1000);
-    values.STATE = "Draft";
+    // Sage groups continuation rows only when transaction-level fields are blank.
+    // Verified in E100: one two-line Draft with the normal auto-assigned SO number.
+    if (index === 0) {
+      values.TRANSACTIONTYPE = "Sales Order";
+      values.DATE = shortDate(transactionDate);
+      values.DOCUMENTNO = ""; // Intacct's configured Sales Order numbering sequence
+      values.CUSTOMER_ID = customer.customer_id;
+      values.TERMNAME = customer.term_name || "";
+      values.DATEDUE = shortDate(dueDate);
+      values.REFERENCENO = reference;
+      values.MESSAGE = (order.notes || "").trim().slice(0, 1000);
+      values.STATE = "Draft";
+    }
     values.LINE = String(index + 1);
     values.ITEMID = item.product_id;
     values.WAREHOUSEID = "WH001";
