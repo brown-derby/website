@@ -65,6 +65,23 @@ assert.equal(entry.STATE, "Draft");
 assert.equal(entry.REFERENCENO, "WEB-1234567812344567890a123456789abc");
 assert.equal(entry.LINE, "1");
 assert.equal(second.LINE, "2");
+for (const field of ["TRANSACTIONTYPE", "DATE", "DOCUMENTNO", "CUSTOMER_ID", "TERMNAME", "DATEDUE", "REFERENCENO", "MESSAGE", "STATE"]) {
+  assert.equal(second[field], "", "Continuation row must leave " + field + " blank");
+}
+assert.equal(second.ITEMID, "0200");
+assert.equal(second.QUANTITY, "2");
+assert.equal(second.WAREHOUSEID, "WH001");
+assert.equal(second.UNIT, "Each");
+
+const manyLines = Array.from({ length: 20 }, (_, i) => ({ ...order.order_items[0], product_id: String(i + 1).padStart(5, "0") }));
+const manyRecords = integration.parseCsv(integration.generateIntacctOrderCsv({ ...order, order_items: manyLines }, customer, "2026-11-25"));
+assert.equal(manyRecords.length, 21);
+for (const [i, row] of manyRecords.slice(1).entries()) {
+  assert.equal(row[headers.indexOf("LINE")], String(i + 1));
+  assert.equal(row[headers.indexOf("TRANSACTIONTYPE")], i === 0 ? "Sales Order" : "");
+  assert.equal(row[headers.indexOf("REFERENCENO")], i === 0 ? entry.REFERENCENO : "");
+}
+
 assert.equal(second.MEMO, 'Display "front"\nstack');
 assert.equal(second.PRICE, "2.25");
 assert.equal(csv, integration.generateIntacctOrderCsv(order, customer, "2026-11-25"), "Same order snapshot must yield same CSV");
