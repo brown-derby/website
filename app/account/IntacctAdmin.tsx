@@ -23,6 +23,8 @@ type ExportAudit = {
   intacct_document_no: string | null;
   ship_date: string | null;
   legacy_reviewed_at: string | null;
+  csv_email_status: "sending" | "accepted" | "failed" | "unknown" | null;
+  csv_email_updated_at: string | null;
 };
 
 type Data = {
@@ -164,9 +166,12 @@ export default function IntacctAdmin() {
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
+      const mail = response.headers.get("X-Intacct-CSV-Email");
       setNotice(redownload
         ? "The original CSV was downloaded again. Check Sage before importing so you do not duplicate this order."
-        : "Order CSV prepared. Import it into Sage Intacct as a Draft, then record the verified Sales Order number.");
+        : "Order CSV prepared. Import as a Draft only after checking for an existing WEB reference." +
+          (mail === "accepted" ? " The internal attachment email was accepted for sending." :
+            " CSV attachment email not confirmed; use this download if needed."));
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to export the order.");
@@ -322,6 +327,10 @@ export default function IntacctAdmin() {
                         <small>{audit?.imported_at ? "Imported: " + audit.intacct_document_no :
                           audit ? "CSV exported " + new Date(audit.exported_at).toLocaleString("en-CA") :
                           ready ? "Ready for controlled export" : "Match customer and verify terms first"}</small>
+                        {audit && <small>CSV email: {audit.csv_email_status === "accepted" ? "Accepted by email provider" :
+                          audit.csv_email_status === "failed" ? "Failed — use saved CSV" :
+                          audit.csv_email_status === "unknown" || audit.csv_email_status === "sending" ? "Delivery uncertain — check CSR mailbox" :
+                          "Not requested (older export)"}</small>}
                       </div>
                       {!audit ? (
                         <div className={styles.confirm}>

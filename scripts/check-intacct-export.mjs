@@ -91,4 +91,33 @@ assert.throws(() => integration.generateIntacctOrderCsv({ ...order, status: "dra
 assert.throws(() => integration.generateIntacctOrderCsv(order, { ...customer, term_name: null }, "2026-11-25"), /payment terms/i);
 assert.throws(() => integration.generateIntacctOrderCsv({ ...order, order_items: [{ ...order.order_items[0], unit_price: 0 }] }, customer, "2026-11-25"), /invalid ID, quantity or price/i);
 
-process.stdout.write("Intacct CSV generation regression checks passed.\n");
+const email = loadTypeScript("lib/intacct-email.ts", () => { throw new Error("Unexpected email dependency"); });
+const previousFrom = process.env.ORDER_EMAIL_FROM;
+const previousKey = process.env.RESEND_API_KEY;
+process.env.ORDER_EMAIL_FROM = "Brown Derby <test@example.invalid>";
+process.env.RESEND_API_KEY = "test-only";
+const mailInput = { orderId, customerId: customer.customer_id, shipDate: "2026-11-25", csv };
+try {
+  let called = 0;
+  const status = await email.sendIntacctCsvEmail(mailInput, async (url, options) => {
+    called++;
+    assert.equal(url, "https://api.resend.com/emails");
+    const payload = JSON.parse(options.body);
+    assert.deepEqual(payload.to, ["csr@brownderby.ca"]);
+    assert.equal(payload.attachments.length, 1);
+    assert.equal(payload.attachments[0].filename, entry.REFERENCENO + ".csv");
+    assert.equal(Buffer.from(payload.attachments[0].content, "base64").toString("utf8"), csv);
+    assert.equal(options.headers["Idempotency-Key"], "brown-derby-intacct-csv-" + orderId);
+    assert.equal(payload.reply_to, undefined);
+    return new Response(JSON.stringify({ id: "mock-email" }), { status: 200 });
+  });
+  assert.equal(called, 1);
+  assert.equal(status, "accepted");
+  assert.equal(await email.sendIntacctCsvEmail(mailInput, async () => new Response("", { status: 400 })), "failed");
+  assert.equal(await email.sendIntacctCsvEmail(mailInput, async () => { throw new Error("Network failure"); }), "unknown");
+  assert.equal(await email.sendIntacctCsvEmail(mailInput, async () => new Response("", { status: 503 })), "unknown");
+} finally {
+  if (previousFrom === undefined) delete process.env.ORDER_EMAIL_FROM; else process.env.ORDER_EMAIL_FROM = previousFrom;
+  if (previousKey === undefined) delete process.env.RESEND_API_KEY; else process.env.RESEND_API_KEY = previousKey;
+}
+process.stdout.write("Intacct CSV and internal attachment regression checks passed.\n");
