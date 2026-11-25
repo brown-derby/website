@@ -39,9 +39,9 @@ function normalize(value: string) {
 }
 
 const legacyCutoff = Date.parse("2026-11-23T03:30:00Z"); // midnight in Newfoundland
-const todayNewfoundland = () => new Intl.DateTimeFormat("en-CA", {
+const dateNewfoundland = (date = new Date()) => new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/St_Johns", year: "numeric", month: "2-digit", day: "2-digit",
-}).format(new Date());
+}).format(date);
 
 export default function IntacctAdmin() {
   const [data, setData] = useState<Data | null>(null);
@@ -53,6 +53,9 @@ export default function IntacctAdmin() {
   const [accountFilter, setAccountFilter] = useState("");
   const [customerFilter, setCustomerFilter] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderPage, setOrderPage] = useState(0);
+  const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
   const [documentNos, setDocumentNos] = useState<Record<string, string>>({});
   const [shipDates, setShipDates] = useState<Record<string, string>>({});
   const [legacyConfirmations, setLegacyConfirmations] = useState<Record<string, boolean>>({});
@@ -72,6 +75,18 @@ export default function IntacctAdmin() {
   const customers = data?.customers || [];
   const orders = data?.orders || [];
   const exports = data?.exports || [];
+  const history = orders.filter(order => {
+    const account = accounts.find(a => a.user_id === order.user_id);
+    const audit = exports.find(record => record.order_id === order.id);
+    const customer = customers.find(c => c.customer_id === (audit?.customer_id || account?.intacct_customer_id));
+    const searchable = [order.customer_business_name, account?.business_name, account?.email,
+      customer?.customer_id, customer?.customer_name, order.id, order.id.replace(/-/g, ""),
+      audit?.reference_no, audit?.intacct_document_no, order.submitted_at].join(" ").toLowerCase();
+    return orderSearch.trim().toLowerCase().split(/\s+/).every(term => searchable.includes(term));
+  });
+  const pageSize = 15;
+  const page = Math.min(orderPage, Math.max(0, Math.ceil(history.length / pageSize) - 1));
+  const pageOrders = history.slice(page * pageSize, (page + 1) * pageSize);
   const selectedAccount = accounts.find(account => account.user_id === selectedUser);
   const matched = accounts.filter(account => account.status === "approved" && account.intacct_customer_id);
   const unmatched = accounts.filter(account => account.status === "approved" && !account.intacct_customer_id);
@@ -147,13 +162,18 @@ export default function IntacctAdmin() {
   }
 
   async function exportOrder(orderId: string, redownload = false) {
+    const order = orders.find(record => record.id === orderId);
+    const audit = exports.find(record => record.order_id === orderId);
+    if (redownload && audit?.imported_at && !window.confirm(
+      "This order has a recorded Sage Sales Order number. Download the original CSV for reference only; do not import it again."
+    )) return;
     setWorking(orderId); setError(""); setNotice("");
     try {
       const response = await post(redownload
-        ? { action: "redownloadOrder", orderId }
+        ? { action: "redownloadOrder", orderId, referenceOnly: Boolean(audit?.imported_at) }
         : {
             action: "exportOrder", orderId,
-            shipDate: shipDates[orderId] || todayNewfoundland(),
+            shipDate: shipDates[orderId] || (order?.submitted_at ? dateNewfoundland(new Date(order.submitted_at)) : dateNewfoundland()),
             reviewedLegacy: legacyConfirmations[orderId] === true,
           });
       if (!(response instanceof Response)) throw new Error("CSV download was not returned.");
@@ -161,7 +181,7 @@ export default function IntacctAdmin() {
       const url = URL.createObjectURL(csv);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = "BrownDerby-WebOrder-" + orderId.slice(0, 8) + ".csv";
+      anchor.download = "WEB-" + orderId.replace(/-/g, "") + ".csv";
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
@@ -185,7 +205,7 @@ export default function IntacctAdmin() {
     setWorking(orderId); setError(""); setNotice("");
     try {
       await post({ action: "confirmImport", orderId, documentNo });
-      setNotice("Intacct Sales Order number recorded. This order will not be offered for export again.");
+      setNotice("Sage Sales Order number recorded. The original CSV remains available for reference.");
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to confirm import.");
@@ -204,7 +224,7 @@ export default function IntacctAdmin() {
           Refresh
         </button>
       </div>
-      <p className={styles.intro}>Customer matching and controlled Sales Order CSV exports. Nothing is posted to Intacct automatically at this stage.</p>
+      <p className={styles.intro}>Customer matching and website order history. Orders are imported into Sage manually.</p>
       {error && <p role="alert" className="portal-message error">{error}</p>}
       {notice && <p role="status" className="portal-message success">{notice}</p>}
       {!data ? <p>Loading Intacct administration…</p> : (
@@ -304,78 +324,115 @@ export default function IntacctAdmin() {
           </div>
 
           <div className={styles.panel}>
-            <h3>Website Sales Orders — manual Sage import</h3>
-            <p>New orders with a valid customer match arrive by email with a frozen CSV attached. Import each CSV as a Draft Sales Order only. After verifying the actual order in Sage, record its Sales Order number here. Orders submitted before November 23, 2026 require checking Sage for an existing order before export. Each exported CSV is frozen for safe re-downloads; do not import it twice.</p>
-            {orders.length === 0 ? <p>No submitted orders yet.</p> : (
-              <div className={styles.orderList}>
-                {orders.map(order => {
+            <h3>Website Order History</h3>
+            <p>Find a previous order or download its original Sage CSV. Check Sage before re-importing.</p>
+            <div className={styles.historyToolbar}>
+              <input aria-label="Search website order history" type="search"
+                placeholder="Search customer, order reference or Sales Order #"
+                value={orderSearch} onChange={event => { setOrderSearch(event.target.value); setOrderPage(0); }} />
+              <small>{history.length} of {orders.length} recent orders{orders.length === 300 ? " (latest 300)" : ""}</small>
+            </div>
+            {pageOrders.length === 0 ? <p>{orders.length === 0 ? "No submitted orders yet." : "No matching orders."}</p> : (
+              <div className={styles.historyList}>
+                <div className={styles.historyHead} aria-hidden="true">
+                  <span>Customer / order</span><span>Date</span><span>Subtotal</span><span>CSV</span>
+                </div>
+                {pageOrders.map(order => {
                   const account = accounts.find(a => a.user_id === order.user_id);
-                  const customer = customers.find(c => c.customer_id === account?.intacct_customer_id);
                   const audit = exports.find(record => record.order_id === order.id);
-                  const ready = account?.status === "approved" &&
-                    Boolean(customer && /^NET[0-9]{1,3}$/i.test(customer.term_name || ""));
+                  const customer = customers.find(c => c.customer_id === (audit?.customer_id || account?.intacct_customer_id));
+                  const terms = customer?.term_name || "";
+                  const ready = account?.status === "approved" && Boolean(customer &&
+                    /^NET[0-9]{1,3}$/i.test(terms) && Number(terms.slice(3)) <= 365);
                   const legacy = Boolean(order.submitted_at && Date.parse(order.submitted_at) < legacyCutoff);
-                  const legacyConfirmed = legacyConfirmations[order.id] === true;
+                  const expanded = expandedOrders[order.id] === true;
+                  const total = (order.order_items || []).reduce((sum, item) => sum + Number(item.unit_price) * item.quantity, 0);
+                  const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(total);
+                  const date = order.submitted_at ? new Date(order.submitted_at).toLocaleDateString("en-CA", { timeZone: "America/St_Johns" }) : "Unknown";
+                  const reference = audit?.reference_no || "WEB-" + order.id.replace(/-/g, "");
+                  const toggle = () => setExpandedOrders(current => ({ ...current, [order.id]: !expanded }));
                   return (
-                    <article key={order.id} className={styles.orderRow}>
-                      <div>
-                        <strong>{order.customer_business_name || account?.business_name || "Customer order"}</strong>
-                        <small>Website order {order.id.slice(0, 8).toUpperCase()} · {order.submitted_at ?
-                          new Date(order.submitted_at).toLocaleDateString("en-CA") : "Unknown date"}
-                          {" · "}{order.order_items?.length || 0} items</small>
-                        {order.email_status !== "sent" && order.email_status && <small role="alert">Order email not confirmed — review this saved order even if no email arrived.</small>}
-                        <small>Intacct customer: {customer ? customer.customer_id + " — " + customer.customer_name : "Not matched"}</small>
-                        <small>{audit?.imported_at ? "Imported: " + audit.intacct_document_no :
-                          audit ? "CSV exported " + new Date(audit.exported_at).toLocaleString("en-CA") :
-                          ready ? "Ready for controlled export" : "Match customer and verify terms first"}</small>
-                        {audit && <small>CSV email: {audit.csv_email_status === "accepted" ? "Accepted by email provider" :
-                          audit.csv_email_status === "failed" ? "Failed — use saved CSV" :
-                          audit.csv_email_status === "unknown" || audit.csv_email_status === "sending" ? "Delivery uncertain — check CSR mailbox" :
-                          "Not requested (older export)"}</small>}
-                      </div>
-                      {!audit ? (
-                        <div className={styles.confirm}>
-                          <label htmlFor={"intacct-ship-" + order.id}>Due/Ship date (not payment due date)</label>
-                          <input id={"intacct-ship-" + order.id} type="date"
-                            value={shipDates[order.id] || todayNewfoundland()}
-                            onChange={event => setShipDates(current => ({ ...current, [order.id]: event.target.value }))} />
-                          {legacy && (
-                            <label className={styles.help}>
-                              <input type="checkbox" checked={legacyConfirmed}
-                                onChange={event => setLegacyConfirmations(current => ({
-                                  ...current, [order.id]: event.target.checked
-                                }))} />
-                              I checked Sage and confirmed this older website order has not been entered already.
-                            </label>
+                    <article key={order.id} className={styles.historyEntry}>
+                      <div className={styles.historyRow}>
+                        <div className={styles.historyCustomer}>
+                          <strong>{order.customer_business_name || account?.business_name || "Customer order"}</strong>
+                          <small>#{order.id.slice(0, 8).toUpperCase()} · {order.order_items?.length || 0} items
+                            {audit?.imported_at ? " · " + (audit.intacct_document_no || "Recorded in Sage") : ""}</small>
+                          {order.email_status && order.email_status !== "sent" && <small className={styles.historyWarning}>Order email not confirmed</small>}
+                          {!audit && !ready && <small className={styles.historyWarning}>Customer match or terms need review</small>}
+                        </div>
+                        <span className={styles.historyDate}>{date}</span>
+                        <strong className={styles.historyTotal}>{money}</strong>
+                        <div className={styles.historyActions}>
+                          {audit ? (
+                            <button type="button" className="button button-secondary" disabled={Boolean(working)}
+                              onClick={() => void exportOrder(order.id, true)}>{working === order.id ? "Working…" : "Download CSV"}</button>
+                          ) : (
+                            <button type="button" className="button button-secondary" disabled={Boolean(working)}
+                              onClick={() => setExpandedOrders(current => ({ ...current, [order.id]: true }))}>
+                              {ready ? "Prepare CSV" : "Review"}
+                            </button>
                           )}
-                          <button type="button" className="button button-secondary"
-                            disabled={!ready || Boolean(working) || (legacy && !legacyConfirmed)}
-                            onClick={() => void exportOrder(order.id)}>
-                            {working === order.id ? "Exporting…" : "Download Intacct CSV"}
-                          </button>
+                          <button type="button" className={styles.historyDetailsButton} aria-expanded={expanded}
+                            aria-controls={"history-" + order.id} onClick={toggle}>{expanded ? "Hide details" : "Details"}</button>
                         </div>
-                      ) : !audit.imported_at ? (
-                        <div className={styles.confirm}>
-                          <small>Frozen Due/Ship date: {audit.ship_date || "Original export"}</small>
-                          <button type="button" className="button button-secondary"
-                            disabled={Boolean(working)} onClick={() => void exportOrder(order.id, true)}>
-                            Download same CSV again
-                          </button>
-                          <label htmlFor={"intacct-doc-" + order.id}>Verified Intacct Sales Order #</label>
-                          <input id={"intacct-doc-" + order.id} placeholder="e.g. SO0268"
-                            value={documentNos[order.id] || ""}
-                            onChange={event => setDocumentNos(current => ({ ...current, [order.id]: event.target.value }))} />
-                          <button type="button" className="button button-secondary"
-                            disabled={Boolean(working)} onClick={() => void confirmImport(order.id)}>
-                            Mark imported
-                          </button>
+                      </div>
+                      {expanded && <div className={styles.historyDetails} id={"history-" + order.id}>
+                        <div className={styles.historyMeta}>
+                          <small>Reference: {reference}</small>
+                          <small>Intacct customer: {audit?.customer_id || customer?.customer_id || "Not matched"}{customer ? " — " + customer.customer_name : ""}</small>
+                          <small>{audit ? "Original CSV prepared" + (audit.ship_date ? " · Ship date " + audit.ship_date : "") : "CSV not prepared"}</small>
+                          {audit?.csv_email_status && <small>CSV email: {audit.csv_email_status === "accepted" ? "Accepted by email provider" : "Not confirmed — check CSR mailbox"}</small>}
                         </div>
-                      ) : <span className={styles.done}>Confirmed</span>}
+                        <div className={styles.historyItems}>
+                          {(order.order_items || []).map(item => <div key={item.product_id}>
+                            <span>{item.product_id} — {item.product_name}{item.item_notes ? " · " + item.item_notes : ""}</span>
+                            <span>{item.quantity} × {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(Number(item.unit_price))}</span>
+                          </div>)}
+                          {order.notes && <p><strong>Order notes:</strong> {order.notes}</p>}
+                        </div>
+                        {!audit ? (
+                          <div className={styles.confirm}>
+                            {!ready && <p className={styles.help}>Confirm the customer match and valid payment terms using the customer matching section above.</p>}
+                            <label htmlFor={"intacct-ship-" + order.id}>Due/Ship date</label>
+                            <input id={"intacct-ship-" + order.id} type="date"
+                              value={shipDates[order.id] || (order.submitted_at ? dateNewfoundland(new Date(order.submitted_at)) : dateNewfoundland())}
+                              onChange={event => setShipDates(current => ({ ...current, [order.id]: event.target.value }))} />
+                            {legacy && <label className={styles.help}>
+                              <input type="checkbox" checked={legacyConfirmations[order.id] === true}
+                                onChange={event => setLegacyConfirmations(current => ({ ...current, [order.id]: event.target.checked }))} />
+                              I checked Sage and confirmed this older order has not already been entered.
+                            </label>}
+                            <button type="button" className="button button-secondary"
+                              disabled={!ready || Boolean(working) || (legacy && !legacyConfirmations[order.id])}
+                              onClick={() => void exportOrder(order.id)}>Prepare and download CSV</button>
+                          </div>
+                        ) : audit.imported_at ? (
+                          <span className={styles.done}>Sage Sales Order recorded: {audit.intacct_document_no}</span>
+                        ) : (
+                          <div className={styles.confirm}>
+                            <label htmlFor={"intacct-doc-" + order.id}>Sage Sales Order # (optional)</label>
+                            <input id={"intacct-doc-" + order.id} placeholder="e.g. SO0268"
+                              value={documentNos[order.id] || ""}
+                              onChange={event => setDocumentNos(current => ({ ...current, [order.id]: event.target.value }))} />
+                            <button type="button" className="button button-secondary"
+                              disabled={Boolean(working) || !(documentNos[order.id] || "").trim()}
+                              onClick={() => void confirmImport(order.id)}>Record Sales Order</button>
+                          </div>
+                        )}
+                      </div>}
                     </article>
                   );
                 })}
               </div>
             )}
+            {history.length > pageSize && <div className={styles.historyPagination}>
+              <button className="button button-secondary" type="button" disabled={page === 0}
+                onClick={() => setOrderPage(page - 1)}>Previous</button>
+              <small>{page * pageSize + 1}–{Math.min((page + 1) * pageSize, history.length)} of {history.length}</small>
+              <button className="button button-secondary" type="button" disabled={(page + 1) * pageSize >= history.length}
+                onClick={() => setOrderPage(page + 1)}>Next</button>
+            </div>}
           </div>
         </>
       )}
