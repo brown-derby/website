@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   emailOrder,
   getOrderForUser,
-  repriceDraftOrder,
   type CustomerOrder,
+  type OrderEmailAttachment,
 } from "../../../../../lib/order-server";
 import {
   databaseRequest,
@@ -51,58 +51,47 @@ export async function POST(
     return NextResponse.json({ error: "Add at least one item before submitting." }, { status: 400 });
   }
 
+  // The database atomically freezes submitted prices, the order and its CSV.
+  // Do not email a draft or regenerate a second CSV with different dates or mapping.
+  let prepared: OrderEmailAttachment & { order: CustomerOrder };
   try {
-    const currentOrder = await repriceDraftOrder(
-      session.user.id,
-      id,
-      session.accessToken
-    );
-    if (!currentOrder) throw new Error("Unable to refresh order prices.");
-
-    await emailOrder(currentOrder);
-
-    const submittedAt = new Date().toISOString();
-    const response = await databaseRequest(
-      "orders?id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(session.user.id),
-      session.accessToken,
-      {
-        method: "PATCH",
-        headers: { Prefer: "return=representation" },
-        body: JSON.stringify({
-          status: "submitted",
-          submitted_at: submittedAt,
-          email_status: "sent",
-        }),
-      }
-    );
-
-    if (!response.ok) throw new Error("Unable to finalize order.");
-    const rows = (await response.json()) as CustomerOrder[];
-
-    return NextResponse.json({ order: rows[0], emailedTo: "csr@brownderby.ca" });
-  } catch (error) {
-    await databaseRequest(
-      "orders?id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(session.user.id),
-      session.accessToken,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ email_status: "failed" }),
-      }
-    ).catch(() => null);
-
-    const detail =
-      error instanceof Error && error.message.startsWith("Email delivery failed:")
-        ? error.message.replace("Email delivery failed:", "Resend rejected the email:")
-        : "";
-
-    return NextResponse.json(
-      {
-        error:
-          process.env.VERCEL_ENV === "preview" && detail
-            ? detail
-            : "The order could not be emailed. Please try again before considering it submitted.",
-      },
-      { status: 502 }
-    );
+    const response = await databaseRequest("rpc/submit_website_order", session.accessToken, {
+      method: "POST", body: JSON.stringify({ target_order_id: id }),
+    });
+    if (!response.ok) {
+      return NextResponse.json({
+        error: "Unable to submit this order. Check your order history before retrying; an item may no longer have an available price.",
+      }, { status: 409 });
+    }
+    prepared = await response.json();
+    if (prepared.order?.id !== id || prepared.order.status !== "submitted") throw new Error("Invalid order snapshot");
+  } catch {
+    return NextResponse.json({
+      error: "Unable to confirm submission. Check your order history before retrying.",
+    }, { status: 503 });
   }
+
+  let emailSent = false;
+  try {
+    await emailOrder(prepared.order, prepared);
+    emailSent = true;
+  } catch {
+    console.warn("Website order saved, email delivery unconfirmed", id);
+  }
+
+  // An email failure must not duplicate or discard a saved order.
+  try {
+    const response = await databaseRequest("rpc/record_website_order_email", session.accessToken, {
+      method: "POST", body: JSON.stringify({ target_order_id: id, sent: emailSent }),
+    });
+    if (!response.ok) console.warn("Website order email status not recorded", id);
+  } catch {
+    console.warn("Website order email status not recorded", id);
+  }
+
+  return NextResponse.json({
+    order: { ...prepared.order, email_status: emailSent ? "sent" : "failed" },
+    emailSent,
+    emailedTo: emailSent ? "csr@brownderby.ca" : null,
+  });
 }
