@@ -279,7 +279,9 @@ function money(value: number | string) {
   }).format(Number.isFinite(number) ? number : 0);
 }
 
-export async function emailOrder(order: CustomerOrder) {
+export type OrderEmailAttachment = { csv: string | null; reference: string; warning: string | null };
+
+export async function emailOrder(order: CustomerOrder, sage?: OrderEmailAttachment) {
   if (!emailConfigured()) {
     throw new Error("Order email is not configured.");
   }
@@ -355,6 +357,12 @@ export async function emailOrder(order: CustomerOrder) {
         escapeHtml(order.notes).replace(/\n/g, "<br>") +
         "</p>"
       : "") +
+    (sage?.csv
+      ? "<p><strong>Sage Intacct import:</strong> The attached CSV is ready to import as one Draft Sales Order in E100 (Brown Derby Wholesale). Search for reference " +
+        escapeHtml(sage.reference) + " before importing, then record the actual Sales Order number in the administrator portal.</p>"
+      : sage?.warning
+        ? "<p style=\"color:#8a2f17\"><strong>Sage CSV needs review:</strong> " + escapeHtml(sage.warning) + "</p>"
+        : "") +
     "<p style=\"color:#655247\">Prices are based on the website catalog at the time the customer submitted the order.</p>" +
     "</div>";
 
@@ -367,10 +375,11 @@ export async function emailOrder(order: CustomerOrder) {
     },
     body: JSON.stringify({
       from: process.env.ORDER_EMAIL_FROM,
-      to: [orderRecipient()],
+      to: [sage ? "csr@brownderby.ca" : orderRecipient()],
       reply_to: order.customer_email || undefined,
       subject,
       html,
+      ...(sage?.csv ? { attachments: [{ filename: sage.reference + ".csv", content: Buffer.from(sage.csv, "utf8").toString("base64"), content_type: "text/csv" }] } : {}),
     }),
   });
 

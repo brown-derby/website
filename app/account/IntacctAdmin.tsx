@@ -13,7 +13,7 @@ type Account = {
   intacct_customer_id: string | null;
 };
 
-type SubmittedOrder = ExportOrder & { customer_business_name?: string };
+type SubmittedOrder = ExportOrder & { customer_business_name?: string; email_status?: "sent" | "failed" | "not_sent" };
 type ExportAudit = {
   order_id: string;
   customer_id: string;
@@ -304,8 +304,8 @@ export default function IntacctAdmin() {
           </div>
 
           <div className={styles.panel}>
-            <h3>Website Sales Orders waiting for Intacct</h3>
-            <p>Import each CSV as a Draft Sales Order only. Orders submitted before November 23, 2026 require checking Sage for an existing order before export. Each exported CSV is frozen for safe re-downloads; do not import it twice.</p>
+            <h3>Website Sales Orders — manual Sage import</h3>
+            <p>New orders with a valid customer match arrive by email with a frozen CSV attached. Import each CSV as a Draft Sales Order only. After verifying the actual order in Sage, record its Sales Order number here. Orders submitted before November 23, 2026 require checking Sage for an existing order before export. Each exported CSV is frozen for safe re-downloads; do not import it twice.</p>
             {orders.length === 0 ? <p>No submitted orders yet.</p> : (
               <div className={styles.orderList}>
                 {orders.map(order => {
@@ -323,6 +323,7 @@ export default function IntacctAdmin() {
                         <small>Website order {order.id.slice(0, 8).toUpperCase()} · {order.submitted_at ?
                           new Date(order.submitted_at).toLocaleDateString("en-CA") : "Unknown date"}
                           {" · "}{order.order_items?.length || 0} items</small>
+                        {order.email_status !== "sent" && order.email_status && <small role="alert">Order email not confirmed — review this saved order even if no email arrived.</small>}
                         <small>Intacct customer: {customer ? customer.customer_id + " — " + customer.customer_name : "Not matched"}</small>
                         <small>{audit?.imported_at ? "Imported: " + audit.intacct_document_no :
                           audit ? "CSV exported " + new Date(audit.exported_at).toLocaleString("en-CA") :

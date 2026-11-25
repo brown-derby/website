@@ -273,8 +273,12 @@ export default function PortalClient() {
     }
 
     setSubmitConfirmOpen(false);
-    setMessage("Order sent to Brown Derby at csr@brownderby.ca.");
     await loadPortal();
+    if (data.emailSent === false) {
+      setError("Your order was saved, but email delivery could not be confirmed. Contact Brown Derby at csr@brownderby.ca with your order reference. Do not submit a duplicate order.");
+    } else {
+      setMessage("Order sent to Brown Derby at csr@brownderby.ca.");
+    }
   }
 
   async function reorder(orderId: string) {
