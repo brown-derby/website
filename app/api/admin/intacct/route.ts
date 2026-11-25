@@ -52,7 +52,7 @@ export async function GET() {
       readRows("customer_accounts?select=user_id,email,business_name,contact_name,status,intacct_customer_id&order=business_name.asc&limit=2000", token),
       readRows<IntacctCustomer>("intacct_customers?select=customer_id,customer_name,term_name,email,secondary_email,city,province,postal_code&order=customer_name.asc&limit=5000", token),
       readRows<ExportOrder>("orders?select=id,user_id,status,submitted_at,notes,customer_business_name,email_status,order_items(product_id,product_name,quantity,unit_price,item_notes)&status=eq.submitted&order=submitted_at.desc&limit=300", token),
-      readRows("intacct_order_exports?select=order_id,customer_id,reference_no,exported_at,imported_at,intacct_document_no,ship_date,legacy_reviewed_at,csv_email_status,csv_email_updated_at&limit=1000", token),
+      readRows("intacct_order_exports?select=order_id,customer_id,reference_no,exported_at,imported_at,intacct_document_no,ship_date,legacy_reviewed_at,csv_email_status,csv_email_updated_at&order=exported_at.desc&limit=1000", token),
     ]);
     return NextResponse.json({ accounts, customers, orders, exports }, { headers: privateHeaders });
   } catch {
@@ -123,8 +123,11 @@ export async function POST(request: NextRequest) {
           encodeURIComponent(body.orderId) + "&limit=1", token
       );
       const snapshot = snapshots[0];
-      if (!snapshot || !snapshot.csv_content || snapshot.imported_at) {
-        throw new Error("No pending CSV snapshot exists for this order.");
+      if (!snapshot || !snapshot.csv_content) {
+        throw new Error("No saved CSV exists for this historical order.");
+      }
+      if (snapshot.imported_at && body.referenceOnly !== true) {
+        throw new Error("This order is already recorded in Sage. Historical CSV downloads are for reference only.");
       }
       // Never regenerate a reserved CSV: customer mapping, terms and prices might have changed.
       return new NextResponse(snapshot.csv_content, {
@@ -132,8 +135,8 @@ export async function POST(request: NextRequest) {
         headers: {
           ...privateHeaders,
           "Content-Type": "text/csv; charset=utf-8",
-          "Content-Disposition": "attachment; filename=BrownDerby-WebOrder-" +
-            body.orderId.slice(0, 8) + ".csv",
+          "Content-Disposition": "attachment; filename=WEB-" +
+            body.orderId.replace(/-/g, "") + ".csv",
         },
       });
     }
