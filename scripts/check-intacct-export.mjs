@@ -121,3 +121,47 @@ try {
   if (previousKey === undefined) delete process.env.RESEND_API_KEY; else process.env.RESEND_API_KEY = previousKey;
 }
 process.stdout.write("Intacct CSV and internal attachment regression checks passed.\n");
+
+const migration = readFileSync("supabase/intacct-server-submission.sql", "utf8");
+assert.ok(migration.includes("'" + headers.join(",") + "'"), "Server-side header order must match Sage template");
+const orderEmail = loadTypeScript("lib/order-server.ts", name => {
+  if (name === "./catalog") return {};
+  if (name === "./portal") return { emailConfigured: () => true, orderRecipient: () => "test@example.invalid" };
+  throw new Error("Unexpected module " + name);
+});
+const previousFetch = globalThis.fetch;
+try {
+  process.env.ORDER_EMAIL_FROM = "Brown Derby <test@example.invalid>";
+  process.env.RESEND_API_KEY = "test-only";
+  let calls = 0;
+  globalThis.fetch = async (url, options) => {
+    calls++;
+    assert.equal(url, "https://api.resend.com/emails");
+    const payload = JSON.parse(options.body);
+    assert.deepEqual(payload.to, ["csr@brownderby.ca"]);
+    assert.equal(payload.reply_to, "customer@example.invalid");
+    assert.equal(options.headers["Idempotency-Key"], "brown-derby-order-" + orderId);
+    assert.match(payload.html, /Sample item/);
+    if (calls === 1) {
+      assert.equal(payload.attachments.length, 1);
+      assert.equal(payload.attachments[0].filename, entry.REFERENCENO + ".csv");
+      assert.equal(Buffer.from(payload.attachments[0].content, "base64").toString("utf8"), csv);
+      assert.match(payload.html, /Draft Sales Order/);
+    } else {
+      assert.equal(payload.attachments, undefined);
+      assert.match(payload.html, /Sage CSV needs review/);
+    }
+    return new Response(JSON.stringify({ id: "mock-email" }), { status: 200 });
+  };
+  const mailOrder = { ...order, customer_email: "customer@example.invalid", customer_business_name: "Test business", customer_contact_name: "Test contact" };
+  await orderEmail.emailOrder(mailOrder, { csv, reference: entry.REFERENCENO, warning: null });
+  await orderEmail.emailOrder(mailOrder, { csv: null, reference: entry.REFERENCENO, warning: "Match customer first" });
+  assert.equal(calls, 2);
+  globalThis.fetch = async () => new Response("mock failure", { status: 500 });
+  await assert.rejects(orderEmail.emailOrder(mailOrder, { csv, reference: entry.REFERENCENO, warning: null }), /Email delivery failed/);
+} finally {
+  globalThis.fetch = previousFetch;
+  if (previousFrom === undefined) delete process.env.ORDER_EMAIL_FROM; else process.env.ORDER_EMAIL_FROM = previousFrom;
+  if (previousKey === undefined) delete process.env.RESEND_API_KEY; else process.env.RESEND_API_KEY = previousKey;
+}
+process.stdout.write("Single order email attachment and missing mapping fallback checks passed.\n");
