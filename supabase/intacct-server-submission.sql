@@ -40,7 +40,7 @@ for each row execute function private.lock_draft_item_parent();
 
 create or replace function private.intacct_csv_cell(raw text) returns text
 language sql immutable set search_path = '' as $$
-  select '"' || replace(case when coalesce(raw,'') ~ '^[=+@' || chr(9) || chr(13) || ']' then chr(39) || raw else coalesce(raw,'') end,'"','""') || '"'
+  select '"' || replace(case when coalesce(raw,'') ~ ('^[=+@' || chr(9) || chr(13) || ']') then chr(39) || raw else coalesce(raw,'') end,'"','""') || '"'
 $$;
 revoke all on function private.intacct_csv_cell(text) from public, anon, authenticated;
 
@@ -50,7 +50,7 @@ returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   o public.orders%rowtype; matched public.intacct_customers%rowtype;
   prices jsonb; csv text; ref text; ship date; stamp timestamptz; warning text;
-  item_data jsonb; existing public.intacct_order_exports%rowtype;
+  item_data jsonb;
 begin
   if auth.uid() is null or not private.has_pricing_access() then
     raise exception 'Approved customer access required' using errcode='42501';
@@ -256,8 +256,8 @@ grant execute on function public.submit_website_order(uuid) to authenticated;
 create or replace function private.record_website_order_email(target_order_id uuid, sent boolean) returns void
 language plpgsql security definer set search_path = '' as $$
 begin
-  if auth.uid() is null or not private.has_pricing_access() then
-    raise exception 'Approved customer access required' using errcode='42501';
+  if auth.uid() is null then
+    raise exception 'Sign in required' using errcode='42501';
   end if;
   update public.orders set email_status=case when sent then 'sent' else 'failed' end
   where id=target_order_id and user_id=auth.uid() and status='submitted' and email_status='not_sent';
