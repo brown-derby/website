@@ -39,9 +39,9 @@ function normalize(value: string) {
 }
 
 const legacyCutoff = Date.parse("2026-11-23T03:30:00Z"); // midnight in Newfoundland
-const todayNewfoundland = () => new Intl.DateTimeFormat("en-CA", {
+const dateNewfoundland = (date = new Date()) => new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/St_Johns", year: "numeric", month: "2-digit", day: "2-digit",
-}).format(new Date());
+}).format(date);
 
 export default function IntacctAdmin() {
   const [data, setData] = useState<Data | null>(null);
@@ -162,6 +162,7 @@ export default function IntacctAdmin() {
   }
 
   async function exportOrder(orderId: string, redownload = false) {
+    const order = orders.find(record => record.id === orderId);
     const audit = exports.find(record => record.order_id === orderId);
     if (redownload && audit?.imported_at && !window.confirm(
       "This order has a recorded Sage Sales Order number. Download the original CSV for reference only; do not import it again."
@@ -169,10 +170,10 @@ export default function IntacctAdmin() {
     setWorking(orderId); setError(""); setNotice("");
     try {
       const response = await post(redownload
-        ? { action: "redownloadOrder", orderId }
+        ? { action: "redownloadOrder", orderId, referenceOnly: Boolean(audit?.imported_at) }
         : {
             action: "exportOrder", orderId,
-            shipDate: shipDates[orderId] || (orders.find(o => o.id === orderId)?.submitted_at ? new Intl.DateTimeFormat("en-CA", { timeZone: "America/St_Johns", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(orders.find(o => o.id === orderId)!.submitted_at!)) : todayNewfoundland()),
+            shipDate: shipDates[orderId] || (order?.submitted_at ? dateNewfoundland(new Date(order.submitted_at)) : dateNewfoundland()),
             reviewedLegacy: legacyConfirmations[orderId] === true,
           });
       if (!(response instanceof Response)) throw new Error("CSV download was not returned.");
@@ -395,7 +396,7 @@ export default function IntacctAdmin() {
                             {!ready && <p className={styles.help}>Confirm the customer match and valid payment terms using the customer matching section above.</p>}
                             <label htmlFor={"intacct-ship-" + order.id}>Due/Ship date</label>
                             <input id={"intacct-ship-" + order.id} type="date"
-                              value={shipDates[order.id] || (order.submitted_at ? new Intl.DateTimeFormat("en-CA", { timeZone: "America/St_Johns", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(order.submitted_at)) : todayNewfoundland())}
+                              value={shipDates[order.id] || (order.submitted_at ? dateNewfoundland(new Date(order.submitted_at)) : dateNewfoundland())}
                               onChange={event => setShipDates(current => ({ ...current, [order.id]: event.target.value }))} />
                             {legacy && <label className={styles.help}>
                               <input type="checkbox" checked={legacyConfirmations[order.id] === true}
